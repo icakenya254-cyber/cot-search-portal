@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circle of Trust - Member Savings & Loan Portal</title>
+  <style>
+    :root {
+      --primary-color: #1b4d3e;
+      --secondary-color: #2c7a6f;
+      --accent-color: #d4af37;
+      --bg-color: #f4f7f6;
+      --card-bg: #ffffff;
+      --text-color: #333333;
+      --border-color: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 24px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .search-card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 24px;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-box input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: var(--secondary-color);
+    }
+
+    .search-box button {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .search-box button:hover {
+      background-color: var(--primary-color);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 5px solid var(--secondary-color);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-card.accent {
+      border-left-color: var(--accent-color);
+    }
+
+    .stat-card h3 {
+      font-size: 0.85rem;
+      color: #666;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .stat-card p {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .statement-section {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .statement-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .statement-header h2 {
+      font-size: 1.3rem;
+      color: var(--primary-color);
+    }
+
+    .print-btn {
+      background-color: transparent;
+      border: 1px solid var(--secondary-color);
+      color: var(--secondary-color);
+      padding: 6px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .print-btn:hover {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.95rem;
+    }
+
+    th {
+      background-color: #f8f9fa;
+      color: #555;
+      font-weight: 600;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #888;
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .search-card, .print-btn {
+        display: none;
+      }
+      .statement-section {
+        box-shadow: none;
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Circle of Trust (SREACH COT)</h1>
+      <p>Member Savings & Loan Tracking Portal</p>
+    </header>
+
+    <div class="search-card">
+      <div class="search-box">
+        <input type="text" id="memberSearchInput" placeholder="Enter Member ID (e.g., 40199469 or 37494364) or Name...">
+        <button id="searchBtn">Search Statement</button>
+      </div>
+    </div>
+
+    <div id="portalContent">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Member Name</h3>
+          <p id="memberNameDisplay">--</p>
+        </div>
+        <div class="stat-card">
+          <h3>Member ID</h3>
+          <p id="memberIdDisplay">--</p>
+        </div>
+        <div class="stat-card accent">
+          <h3>Total Savings Balance</h3>
+          <p id="totalSavingsDisplay">KES 0.00</p>
+        </div>
+        <div class="stat-card">
+          <h3>Active Loan Balance</h3>
+          <p id="loanBalanceDisplay">KES 0.00</p>
+        </div>
+      </div>
+
+      <div class="statement-section">
+        <div class="statement-header">
+          <h2>Transaction History</h2>
+          <button class="print-btn" onclick="window.print()">Print Statement</button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th class="text-right">Debit</th>
+              <th class="text-right">Credit</th>
+              <th class="text-right">Balance</th>
+            </tr>
+          </thead>
+          <tbody id="transactionTableBody">
+            <tr>
+              <td colspan="5" class="empty-state">Enter a valid Member ID or Name above to load records.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase Integration Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
+    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+
+    // Firebase Config Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9yLNm68mEK4PzO1wj5_jCWn7qTSiOSm0",
+      authDomain: "cot-search-portal.firebaseapp.com",
+      databaseURL: "https://cot-search-portal-default-rtdb.firebaseio.com",
+      projectId: "cot-search-portal",
+      storageBucket: "cot-search-portal.firebasestorage.app",
+      messagingSenderId: "774313878126",
+      appId: "1:774313878126:web:cd91b1eba849ba3020bc7f",
+      measurementId: "G-479WXFM1DM"
+    };
+
+    // Initialize Firebase Services
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getDatabase(app);
+
+    // Fallback Excel Dataset
+    const localDatabase = {
+      "40199469": {
+        name: "MARY ANYANGO",
+        id: "40199469",
+        savingsTotal: 1850,
+        loanBalance: 0,
+        transactions: [
+          { date: "2026-08-17", desc: "Savings Deposit", debit: "-", credit: 100, balance: 100 },
+          { date: "2026-08-18", desc: "Savings Deposit", debit: "-", credit: 100, balance: 200 },
+          { date: "2026-08-19", desc: "Savings Deposit", debit: "-", credit: 150, balance: 350 },
+          { date: "2026-08-20", desc: "Savings Deposit", debit: "-", credit: 150, balance: 500 },
+          { date: "2026-08-21", desc: "Savings Deposit", debit: "-", credit: 150, balance: 650 },
+          { date: "2026-08-22", desc: "Savings Deposit", debit: "-", credit: 150, balance: 800 },
+          { date: "2026-08-23", desc: "Savings Deposit", debit: "-", credit: 200, balance: 1000 },
+          { date: "2026-08-24", desc: "Savings Deposit", debit: "-", credit: 200, balance: 1200 },
+          { date: "2026-08-25", desc: "Savings Deposit", debit: "-", credit: 150, balance: 1350 },
+          { date: "2026-08-26", desc: "Savings Deposit", debit: "-", credit: 100, balance: 1450 },
+          { date: "2026-08-27", desc: "Savings Deposit", debit: "-", credit: 150, balance: 1600 },
+          { date: "2026-08-28", desc: "Savings Deposit", debit: "-", credit: 100, balance: 1700 },
+          { date: "2026-08-28", desc: "Registration Account", debit: "-", credit: 100, balance: 1800 },
+          { date: "2026-08-29", desc: "Savings Deposit", debit: "-", credit: 50, balance: 1850 }
+        ]
+      },
+      "37494364": {
+        name: "SAMUEL WANGIRA",
+        id: "37494364",
+        savingsTotal: 200,
+        loanBalance: 0,
+        transactions: [
+          { date: "2026-08-16", desc: "Savings Deposit", debit: "-", credit: 100, balance: 100 },
+          { date: "2026-08-28", desc: "Savings Deposit", debit: "-", credit: 100, balance: 200 }
+        ]
+      }
+    };
+
+    // Member Search Logic
+    async function searchMember() {
+      const query = document.getElementById("memberSearchInput").value.trim().toLowerCase();
+      if (!query) return;
+
+      let foundMember = null;
+
+      // 1. Check Firebase Realtime Database
+      try {
+        const dbRef = ref(db);
+        const snapshot = await get(child(dbRef, `members/${query}`));
+        if (snapshot.exists()) {
+          foundMember = snapshot.val();
+        }
+      } catch (err) {
+        console.warn("Firebase search offline or empty, switching to local dataset:", err);
+      }
+
+      // 2. Fallback local dataset search (by ID or Name match)
+      if (!foundMember) {
+        for (const id in localDatabase) {
+          if (id.toLowerCase() === query || localDatabase[id].name.toLowerCase().includes(query)) {
+            foundMember = localDatabase[id];
+            break;
+          }
+        }
+      }
+
+      // 3. Render Results
+      renderMemberData(foundMember);
+    }
+
+    function renderMemberData(member) {
+      const tbody = document.getElementById("transactionTableBody");
+      
+      if (!member) {
+        document.getElementById("memberNameDisplay").innerText = "Not Found";
+        document.getElementById("memberIdDisplay").innerText = "N/A";
+        document.getElementById("totalSavingsDisplay").innerText = "KES 0.00";
+        document.getElementById("loanBalanceDisplay").innerText = "KES 0.00";
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No records found matching your query.</td></tr>`;
+        return;
+      }
+
+      document.getElementById("memberNameDisplay").innerText = member.name;
+      document.getElementById("memberIdDisplay").innerText = member.id || "N/A";
+      document.getElementById("totalSavingsDisplay").innerText = `KES ${member.savingsTotal.toLocaleString()}`;
+      document.getElementById("loanBalanceDisplay").innerText = `KES ${(member.loanBalance || 0).toLocaleString()}`;
+
+      if (member.transactions && member.transactions.length > 0) {
+        tbody.innerHTML = member.transactions.map(t => `
+          <tr>
+            <td>${t.date}</td>
+            <td>${t.desc || 'Savings Deposit'}</td>
+            <td class="text-right">${t.debit !== undefined ? t.debit : '-'}</td>
+            <td class="text-right">KES ${t.credit}</td>
+            <td class="text-right"><strong>KES ${t.balance}</strong></td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No transaction records available.</td></tr>`;
+      }
+    }
+
+    // Attach Event Listeners
+    document.getElementById("searchBtn").addEventListener("click", searchMember);
+    document.getElementById("memberSearchInput").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") searchMember();
+    });
+  </script>
+</body>
+</html>
