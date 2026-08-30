@@ -30,7 +30,7 @@
     }
 
     .container {
-      max-width: 950px;
+      max-width: 900px;
       margin: 0 auto;
     }
 
@@ -166,19 +166,6 @@
       background-color: var(--primary-color);
     }
 
-    .btn-action {
-      padding: 4px 10px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      border-radius: 4px;
-      cursor: pointer;
-      border: none;
-      margin-right: 4px;
-    }
-
-    .btn-edit { background-color: #f39c12; color: white; }
-    .btn-delete { background-color: var(--danger-color); color: white; }
-
     .search-card {
       background: var(--card-bg);
       padding: 16px;
@@ -199,4 +186,496 @@
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 12px;
+      border-left: 5px solid var(--secondary-color);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .stat-card.accent {
+      border-left-color: var(--accent-color);
+    }
+
+    .stat-card h3 {
+      font-size: 0.8rem;
+      color: #666;
+      text-transform: uppercase;
+    }
+
+    .stat-card p {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-top: 4px;
+    }
+
+    .statement-section {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .statement-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.9rem;
+    }
+
+    th {
+      background-color: #f8f9fa;
+      color: #555;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px;
+      color: #888;
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .admin-card, .search-card, .auth-bar, button { display: none !important; }
+      .statement-section { box-shadow: none; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="auth-bar">
+        <button id="authToggleBtn" class="auth-btn">Admin Login</button>
+      </div>
+      <h1>Circle of Trust (SEARCH COT)</h1>
+      <p>Member Portal & Statement Viewer</p>
+    </header>
+
+    <!-- ADMIN PANEL -->
+    <div id="adminPanel" class="admin-card">
+      <h2>🔒 Admin Control Panel</h2>
+      
+      <!-- Tab Controls -->
+      <div class="admin-tabs">
+        <button class="tab-btn active" onclick="switchTab('addMemberTab')">Add Members</button>
+        <button class="tab-btn" onclick="switchTab('savingsTab')">Savings</button>
+        <button class="tab-btn" onclick="switchTab('loanTab')">Loans</button>
+      </div>
+
+      <!-- Tab 1: Add Members -->
+      <div id="addMemberTab" class="tab-content active">
+        <form id="addMemberForm" class="admin-grid">
+          <div class="form-group">
+            <label for="newMemberId">Member ID</label>
+            <input type="text" id="newMemberId" required>
+          </div>
+          <div class="form-group">
+            <label for="newMemberName">Member Full Name</label>
+            <input type="text" id="newMemberName" required>
+          </div>
+          <div class="form-group">
+            <label for="regFee">Registration Fee (KES)</label>
+            <input type="number" id="regFee" min="0" required>
+          </div>
+          <div class="form-group">
+            <label for="addMemberDate">Registration Date</label>
+            <input type="date" class="date-picker" id="addMemberDate" required>
+          </div>
+          <button type="submit" class="btn-submit">Register Member</button>
+        </form>
+      </div>
+
+      <!-- Tab 2: Savings -->
+      <div id="savingsTab" class="tab-content">
+        <form id="savingsForm" class="admin-grid">
+          <div class="form-group">
+            <label for="savingsMemberId">Member ID</label>
+            <input type="text" id="savingsMemberId" required>
+          </div>
+          <div class="form-group">
+            <label for="savingsAmount">Savings Deposit Amount (KES)</label>
+            <input type="number" id="savingsAmount" min="1" required>
+          </div>
+          <div class="form-group">
+            <label for="savingsDate">Date</label>
+            <input type="date" class="date-picker" id="savingsDate" required>
+          </div>
+          <button type="submit" class="btn-submit">Record Savings Deposit</button>
+        </form>
+      </div>
+
+      <!-- Tab 3: Loans -->
+      <div id="loanTab" class="tab-content">
+        <form id="loanForm" class="admin-grid">
+          <div class="form-group">
+            <label for="loanMemberId">Member ID</label>
+            <input type="text" id="loanMemberId" required>
+          </div>
+          <div class="form-group">
+            <label for="loanType">Transaction Type</label>
+            <select id="loanType">
+              <option value="Loan Issued">Issue New Loan</option>
+              <option value="Loan Repayment">Record Loan Repayment</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="loanAmount">Amount (KES)</label>
+            <input type="number" id="loanAmount" min="1" required>
+          </div>
+          <div class="form-group">
+            <label for="loanDate">Date</label>
+            <input type="date" class="date-picker" id="loanDate" required>
+          </div>
+          <button type="submit" class="btn-submit">Save Loan Transaction</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MEMBER SEARCH SECTION -->
+    <div class="search-card">
+      <div class="search-box">
+        <input type="text" id="memberSearchInput">
+        <button id="searchBtn" style="background:var(--secondary-color); color:white; border:none; border-radius:8px; padding:0 18px; font-weight:600; cursor:pointer;">Search</button>
+      </div>
+    </div>
+
+    <!-- MEMBER STATEMENT DISPLAY -->
+    <div id="portalContent">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Member Name</h3>
+          <p id="memberNameDisplay">--</p>
+        </div>
+        <div class="stat-card">
+          <h3>Member ID</h3>
+          <p id="memberIdDisplay">--</p>
+        </div>
+        <div class="stat-card accent">
+          <h3>Total Savings</h3>
+          <p id="totalSavingsDisplay">KES 0.00</p>
+        </div>
+        <div class="stat-card">
+          <h3>Active Loan</h3>
+          <p id="loanBalanceDisplay">KES 0.00</p>
+        </div>
+      </div>
+
+      <div class="statement-section">
+        <div class="statement-header">
+          <h2>Member Statement</h2>
+          <button onclick="window.print()" style="background:transparent; border:1px solid var(--secondary-color); color:var(--secondary-color); padding:4px 12px; border-radius:6px; font-weight:600; cursor:pointer;">Print Statement</button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th class="text-right">Debit</th>
+              <th class="text-right">Credit</th>
+              <th class="text-right">Balance</th>
+            </tr>
+          </thead>
+          <tbody id="transactionTableBody">
+            <tr>
+              <td colspan="5" class="empty-state">Enter Member ID or Name above to display statement.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase Integration Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+    import { getDatabase, ref, get, set, child } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9yLNm68mEK4PzO1wj5_jCWn7qTSiOSm0",
+      authDomain: "cot-search-portal.firebaseapp.com",
+      databaseURL: "https://cot-search-portal-default-rtdb.firebaseio.com",
+      projectId: "cot-search-portal",
+      storageBucket: "cot-search-portal.firebasestorage.app",
+      messagingSenderId: "774313878126",
+      appId: "1:774313878126:web:cd91b1eba849ba3020bc7f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const ADMIN_PASSKEY = "cotadmin";
+    let isAdminLoggedIn = false;
+
+    const authBtn = document.getElementById("authToggleBtn");
+    const adminPanel = document.getElementById("adminPanel");
+
+    authBtn.addEventListener("click", () => {
+      if (!isAdminLoggedIn) {
+        const pass = prompt("Enter Admin Passkey:");
+        if (pass === ADMIN_PASSKEY) {
+          isAdminLoggedIn = true;
+          adminPanel.style.display = "block";
+          authBtn.innerText = "Admin Logout";
+          authBtn.style.background = "var(--danger-color)";
+          alert("Admin Mode Unlocked!");
+        } else if (pass !== null) {
+          alert("Incorrect Passkey!");
+        }
+      } else {
+        isAdminLoggedIn = false;
+        adminPanel.style.display = "none";
+        authBtn.innerText = "Admin Login";
+        authBtn.style.background = "rgba(255, 255, 255, 0.2)";
+      }
+    });
+
+    // Set all date pickers to today's date
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('.date-picker').forEach(input => input.value = today);
+
+    // Tab Navigation Logic
+    window.switchTab = function(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    };
+
+    // Helper: Save transaction record to Firebase
+    async function processTransaction(id, desc, amount, date) {
+      const memberRef = ref(db, `members/${id}`);
+      const snapshot = await get(memberRef);
+      
+      if (!snapshot.exists()) {
+        alert("Member ID does not exist! Please add the member first under 'Add Members'.");
+        return null;
+      }
+
+      let memberData = snapshot.val();
+      if (!memberData.transactions) memberData.transactions = [];
+
+      let debit = "-";
+      let credit = "-";
+
+      if (desc === "Savings Deposit" || desc === "Registration Fee") {
+        credit = amount;
+        memberData.savingsTotal = (memberData.savingsTotal || 0) + amount;
+      } else if (desc === "Loan Issued") {
+        debit = amount;
+        memberData.loanBalance = (memberData.loanBalance || 0) + amount;
+      } else if (desc === "Loan Repayment") {
+        credit = amount;
+        memberData.loanBalance = Math.max(0, (memberData.loanBalance || 0) - amount);
+      }
+
+      const newTx = {
+        date: date,
+        desc: desc,
+        debit: debit,
+        credit: credit,
+        balance: desc.includes("Loan") ? memberData.loanBalance : memberData.savingsTotal
+      };
+
+      memberData.transactions.push(newTx);
+      await set(memberRef, memberData);
+      return memberData;
+    }
+
+    // Tab 1 Submit: Add Member
+    document.getElementById("addMemberForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!isAdminLoggedIn) return;
+
+      const id = document.getElementById("newMemberId").value.trim();
+      const name = document.getElementById("newMemberName").value.trim().toUpperCase();
+      const regFee = parseFloat(document.getElementById("regFee").value) || 0;
+      const date = document.getElementById("addMemberDate").value;
+
+      try {
+        const memberRef = ref(db, `members/${id}`);
+        const snapshot = await get(memberRef);
+
+        if (snapshot.exists()) {
+          alert(`Member ID ${id} already exists! Use Savings or Loan tab to post transactions.`);
+          return;
+        }
+
+        let newMemberData = {
+          id: id,
+          name: name,
+          savingsTotal: 0,
+          loanBalance: 0,
+          transactions: []
+        };
+
+        if (regFee > 0) {
+          newMemberData.savingsTotal = regFee;
+          newMemberData.transactions.push({
+            date: date,
+            desc: "Registration Fee",
+            debit: "-",
+            credit: regFee,
+            balance: regFee
+          });
+        }
+
+        await set(memberRef, newMemberData);
+        alert(`Successfully added Member: ${name} (ID: ${id})`);
+        renderMemberData(newMemberData);
+        document.getElementById("addMemberForm").reset();
+        document.getElementById("addMemberDate").value = today;
+      } catch (err) {
+        console.error(err);
+        alert("Failed to register member.");
+      }
+    });
+
+    // Tab 2 Submit: Savings
+    document.getElementById("savingsForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!isAdminLoggedIn) return;
+
+      const id = document.getElementById("savingsMemberId").value.trim();
+      const amount = parseFloat(document.getElementById("savingsAmount").value);
+      const date = document.getElementById("savingsDate").value;
+
+      try {
+        const updatedMember = await processTransaction(id, "Savings Deposit", amount, date);
+        if (updatedMember) {
+          alert(`Successfully saved KES ${amount} deposit for Member ${id}!`);
+          renderMemberData(updatedMember);
+          document.getElementById("savingsForm").reset();
+          document.getElementById("savingsDate").value = today;
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Failed to record savings.");
+      }
+    });
+
+    // Tab 3 Submit: Loans
+    document.getElementById("loanForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!isAdminLoggedIn) return;
+
+      const id = document.getElementById("loanMemberId").value.trim();
+      const type = document.getElementById("loanType").value;
+      const amount = parseFloat(document.getElementById("loanAmount").value);
+      const date = document.getElementById("loanDate").value;
+
+      try {
+        const updatedMember = await processTransaction(id, type, amount, date);
+        if (updatedMember) {
+          alert(`Successfully recorded ${type} of KES ${amount} for Member ${id}!`);
+          renderMemberData(updatedMember);
+          document.getElementById("loanForm").reset();
+          document.getElementById("loanDate").value = today;
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Failed to record loan transaction.");
+      }
+    });
+
+    // Dual-Mode Member Search (ID or Name)
+    async function searchMember() {
+      const query = document.getElementById("memberSearchInput").value.trim().toLowerCase();
+      if (!query) return;
+
+      try {
+        const dbRef = ref(db);
+        
+        const directSnapshot = await get(child(dbRef, `members/${query}`));
+        if (directSnapshot.exists()) {
+          renderMemberData(directSnapshot.val());
+          return;
+        }
+
+        const allMembersSnapshot = await get(child(dbRef, `members`));
+        if (allMembersSnapshot.exists()) {
+          const membersObj = allMembersSnapshot.val();
+          const matchedKey = Object.keys(membersObj).find(key => {
+            const member = membersObj[key];
+            const nameMatch = member.name && member.name.toLowerCase().includes(query);
+            const idMatch = member.id && String(member.id).toLowerCase() === query;
+            return nameMatch || idMatch;
+          });
+
+          if (matchedKey) {
+            renderMemberData(membersObj[matchedKey]);
+            return;
+          }
+        }
+
+        renderMemberData(null);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    }
+
+    function renderMemberData(member) {
+      const tbody = document.getElementById("transactionTableBody");
+      
+      if (!member) {
+        document.getElementById("memberNameDisplay").innerText = "Not Found";
+        document.getElementById("memberIdDisplay").innerText = "N/A";
+        document.getElementById("totalSavingsDisplay").innerText = "KES 0.00";
+        document.getElementById("loanBalanceDisplay").innerText = "KES 0.00";
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No records found matching your query.</td></tr>`;
+        return;
+      }
+
+      document.getElementById("memberNameDisplay").innerText = member.name;
+      document.getElementById("memberIdDisplay").innerText = member.id || "N/A";
+      document.getElementById("totalSavingsDisplay").innerText = `KES ${(member.savingsTotal || 0).toLocaleString()}`;
+      document.getElementById("loanBalanceDisplay").innerText = `KES ${(member.loanBalance || 0).toLocaleString()}`;
+
+      if (member.transactions && member.transactions.length > 0) {
+        tbody.innerHTML = member.transactions.map(t => `
+          <tr>
+            <td>${t.date}</td>
+            <td>${t.desc}</td>
+            <td class="text-right">${t.debit !== "-" ? 'KES ' + Number(t.debit).toLocaleString() : '-'}</td>
+            <td class="text-right">${t.credit !== "-" ? 'KES ' + Number(t.credit).toLocaleString() : '-'}</td>
+            <td class="text-right"><strong>KES ${Number(t.balance).toLocaleString()}</strong></td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No transactions recorded yet.</td></tr>`;
+      }
+    }
+
+    document.getElementById("searchBtn").addEventListener("click", searchMember);
+    document.getElementById("memberSearchInput").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") searchMember();
+    });
+  </script>
+</body>
+</html>
