@@ -597,6 +597,27 @@
     </div>
   </div>
 
+  <!-- ADMIN LOGIN MODAL -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Admin Authentication</h3>
+        <button class="close-btn" onclick="closeLoginModal()">&times;</button>
+      </div>
+      <form id="loginForm" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="form-group">
+          <label for="adminEmail">Admin Email</label>
+          <input type="email" id="adminEmail" placeholder="e.g. admin@circleoftrust.com" required>
+        </div>
+        <div class="form-group">
+          <label for="adminPassword">Admin Password</label>
+          <input type="password" id="adminPassword" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn-submit">Login</button>
+      </form>
+    </div>
+  </div>
+
   <!-- ADD MEMBER MODAL -->
   <div id="addMemberModal" class="modal">
     <div class="modal-content">
@@ -668,6 +689,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
     import { getDatabase, ref, get, set, update, child } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB9yLNm68mEK4PzO1wj5_jCWn7qTSiOSm0",
@@ -681,30 +703,59 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const auth = getAuth(app);
 
-    const ADMIN_PASSKEY = "cotadmin";
-    let isAdminLoggedIn = false;
+    let currentUser = null;
 
     const authBtn = document.getElementById("authToggleBtn");
     const adminPanel = document.getElementById("adminPanel");
+    const loginModal = document.getElementById("loginModal");
 
-    authBtn.addEventListener("click", () => {
-      if (!isAdminLoggedIn) {
-        const pass = prompt("Enter Admin Passkey:");
-        if (pass === ADMIN_PASSKEY) {
-          isAdminLoggedIn = true;
-          adminPanel.style.display = "block";
-          authBtn.innerText = "Admin Logout";
-          authBtn.style.background = "var(--danger-color)";
-          alert("Admin Mode Unlocked!");
-        } else if (pass !== null) {
-          alert("Incorrect Passkey!");
-        }
+    // Track state securely via Firebase Auth listener
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        adminPanel.style.display = "block";
+        authBtn.innerText = "Admin Logout";
+        authBtn.style.background = "var(--danger-color)";
       } else {
-        isAdminLoggedIn = false;
+        currentUser = null;
         adminPanel.style.display = "none";
         authBtn.innerText = "Admin Login";
         authBtn.style.background = "rgba(255, 255, 255, 0.2)";
+      }
+    });
+
+    authBtn.addEventListener("click", () => {
+      if (!currentUser) {
+        loginModal.style.display = "flex";
+      } else {
+        signOut(auth).then(() => {
+          alert("Logged out successfully.");
+        }).catch((err) => {
+          console.error("Logout Error:", err);
+        });
+      }
+    });
+
+    window.closeLoginModal = function() {
+      loginModal.style.display = "none";
+    };
+
+    // Firebase Backend Authentication Handler
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("adminEmail").value.trim();
+      const password = document.getElementById("adminPassword").value.trim();
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Admin Login Successful!");
+        closeLoginModal();
+        document.getElementById("loginForm").reset();
+      } catch (error) {
+        console.error("Authentication Failed:", error);
+        alert("Invalid Email or Password!");
       }
     });
 
@@ -712,7 +763,7 @@
     const defaultSavingsStartDate = "2026-09-01";
     document.querySelectorAll('.date-picker').forEach(input => input.value = defaultSavingsStartDate);
 
-    // Auto-generate next Membership ID (e.g. COT001, COT002)
+    // Auto-generate next Membership ID (e.g. COT-0001, COT-0002)
     async function generateNextMemberId() {
       try {
         const dbRef = ref(db);
@@ -729,14 +780,14 @@
         document.getElementById("newMemberId").value = autoId;
       } catch (err) {
         console.error("Error generating Member ID:", err);
-        document.getElementById("newMemberId").value = "COT001";
+        document.getElementById("newMemberId").value = "COT-0001";
       }
     }
 
     // Assign sequential Membership IDs to all existing records that lack one
     window.assignMemberNumbersToExisting = async function() {
-      if (!isAdminLoggedIn) return;
-      if (!confirm("Auto-assign sequential Membership Numbers (e.g. COT001) to all existing members?")) return;
+      if (!currentUser) return;
+      if (!confirm("Auto-assign sequential Membership Numbers (e.g. COT-0001) to all existing members?")) return;
 
       try {
         const dbRef = ref(db);
@@ -772,7 +823,7 @@
 
     // Modal Add Member logic
     window.openAddMemberModal = function() {
-      if (!isAdminLoggedIn) return;
+      if (!currentUser) return;
       generateNextMemberId();
       document.getElementById("addMemberModal").style.display = "flex";
     };
@@ -915,7 +966,7 @@
     // Modal Submit: Add Member
     document.getElementById("addMemberForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (!isAdminLoggedIn) return;
+      if (!currentUser) return;
 
       const nationalId = document.getElementById("newNationalId").value.trim();
       const id = document.getElementById("newMemberId").value.trim();
@@ -977,7 +1028,7 @@
     // Tab 1 Submit: Savings
     document.getElementById("savingsForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (!isAdminLoggedIn) return;
+      if (!currentUser) return;
 
       const nationalId = document.getElementById("savingsMemberId").value.trim();
       const amount = parseFloat(document.getElementById("savingsAmount").value);
@@ -1001,7 +1052,7 @@
     // Tab 2 Submit: Loans
     document.getElementById("loanForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (!isAdminLoggedIn) return;
+      if (!currentUser) return;
 
       const nationalId = document.getElementById("loanMemberId").value.trim();
       const type = document.getElementById("loanType").value;
@@ -1085,7 +1136,7 @@
 
     // Toggle Member Active/Inactive Status
     window.toggleStatus = async function(key, currentStatus) {
-      if (!isAdminLoggedIn) return;
+      if (!currentUser) return;
       const newStatus = currentStatus === "Inactive" ? "Active" : "Inactive";
       if (!confirm(`Are you sure you want to set status to ${newStatus}?`)) return;
 
@@ -1101,7 +1152,7 @@
 
     // Modal Edit Logic
     window.openEditModal = function(key, memberId, nationalId, name, phone) {
-      if (!isAdminLoggedIn) return;
+      if (!currentUser) return;
       document.getElementById("editDbKey").value = key;
       document.getElementById("editMemberId").value = memberId;
       document.getElementById("editNationalId").value = nationalId;
@@ -1116,7 +1167,7 @@
 
     document.getElementById("editMemberForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (!isAdminLoggedIn) return;
+      if (!currentUser) return;
 
       const key = document.getElementById("editDbKey").value;
       const newMemberId = document.getElementById("editMemberId").value.trim();
