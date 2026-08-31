@@ -14,6 +14,7 @@
       --text-color: #333333;
       --border-color: #e0e0e0;
       --danger-color: #c0392b;
+      --success-color: #27ae60;
     }
 
     * {
@@ -30,7 +31,7 @@
     }
 
     .container {
-      max-width: 900px;
+      max-width: 980px;
       margin: 0 auto;
     }
 
@@ -71,6 +72,45 @@
       background: rgba(255, 255, 255, 0.3);
     }
 
+    /* Paybill Card Styling */
+    .paybill-card {
+      background: #e8f5e9;
+      border: 2px dashed #27ae60;
+      padding: 14px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .paybill-title {
+      font-weight: bold;
+      color: #1b5e20;
+      font-size: 0.95rem;
+    }
+
+    .paybill-details {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .paybill-pill {
+      background: #ffffff;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      border: 1px solid #c8e6c9;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .paybill-pill strong {
+      color: #2e7d32;
+    }
+
     /* Admin Card & Tab System */
     .admin-card {
       display: none;
@@ -94,6 +134,7 @@
       margin-bottom: 16px;
       border-bottom: 2px solid var(--border-color);
       padding-bottom: 8px;
+      flex-wrap: wrap;
     }
 
     .tab-btn {
@@ -139,12 +180,31 @@
       color: #555;
     }
 
+    .member-preview {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--secondary-color);
+      margin-top: 2px;
+      min-height: 1.2em;
+    }
+
+    .member-preview.error {
+      color: var(--danger-color);
+    }
+
     input, select, button {
       padding: 10px 14px;
       border: 1px solid var(--border-color);
       border-radius: 8px;
       font-size: 0.95rem;
       outline: none;
+    }
+
+    input[readonly] {
+      background-color: #e9ecef;
+      color: #555;
+      cursor: not-allowed;
+      font-weight: bold;
     }
 
     input:focus, select:focus {
@@ -160,6 +220,7 @@
       margin-top: 8px;
       grid-column: 1 / -1;
       transition: background 0.2s;
+      width: 100%;
     }
 
     .btn-submit:hover {
@@ -258,9 +319,95 @@
       color: #888;
     }
 
+    /* Action Buttons & Status Badges */
+    .badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      display: inline-block;
+    }
+    .badge-active { background-color: #e8f8f0; color: var(--success-color); }
+    .badge-inactive { background-color: #fde8e8; color: var(--danger-color); }
+
+    .btn-action {
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+    .btn-edit { background: #3498db; color: white; }
+    .btn-toggle { background: #e67e22; color: white; }
+    .btn-add-member {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .btn-add-member:hover {
+      background: var(--secondary-color);
+    }
+
+    .btn-assign-ids {
+      background: var(--accent-color);
+      color: #333;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .btn-assign-ids:hover {
+      opacity: 0.9;
+    }
+
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 450px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #777;
+    }
+
     @media print {
       body { background: white; padding: 0; }
-      .admin-card, .search-card, .auth-bar, button { display: none !important; }
+      .admin-card, .search-card, .paybill-card, .auth-bar, .modal, button { display: none !important; }
       .statement-section { box-shadow: none; padding: 0; }
     }
   </style>
@@ -282,59 +429,38 @@
       
       <!-- Tab Controls -->
       <div class="admin-tabs">
-        <button class="tab-btn active" onclick="switchTab('addMemberTab')">Add Members</button>
-        <button class="tab-btn" onclick="switchTab('savingsTab')">Savings</button>
-        <button class="tab-btn" onclick="switchTab('loanTab')">Loans</button>
+        <button class="tab-btn active" id="tabBtnSavings" onclick="switchTab('savingsTab', event)">Savings</button>
+        <button class="tab-btn" id="tabBtnLoan" onclick="switchTab('loanTab', event)">Loans</button>
+        <button class="tab-btn" id="tabBtnAllMembers" onclick="switchTab('allMembersTab', event)">All Members</button>
       </div>
 
-      <!-- Tab 1: Add Members -->
-      <div id="addMemberTab" class="tab-content active">
-        <form id="addMemberForm" class="admin-grid">
-          <div class="form-group">
-            <label for="newMemberId">Member ID</label>
-            <input type="text" id="newMemberId" required>
-          </div>
-          <div class="form-group">
-            <label for="newMemberName">Member Full Name</label>
-            <input type="text" id="newMemberName" required>
-          </div>
-          <div class="form-group">
-            <label for="regFee">Registration Fee (KES)</label>
-            <input type="number" id="regFee" min="0" required>
-          </div>
-          <div class="form-group">
-            <label for="addMemberDate">Registration Date</label>
-            <input type="date" class="date-picker" id="addMemberDate" required>
-          </div>
-          <button type="submit" class="btn-submit">Register Member</button>
-        </form>
-      </div>
-
-      <!-- Tab 2: Savings -->
-      <div id="savingsTab" class="tab-content">
+      <!-- Tab 1: Savings -->
+      <div id="savingsTab" class="tab-content active">
         <form id="savingsForm" class="admin-grid">
           <div class="form-group">
-            <label for="savingsMemberId">Member ID</label>
-            <input type="text" id="savingsMemberId" required>
+            <label for="savingsMemberId">Member National ID Number</label>
+            <input type="text" id="savingsMemberId" placeholder="Type National ID Number..." required>
+            <div id="savingsMemberNamePreview" class="member-preview"></div>
           </div>
           <div class="form-group">
             <label for="savingsAmount">Savings Deposit Amount (KES)</label>
             <input type="number" id="savingsAmount" min="1" required>
           </div>
           <div class="form-group">
-            <label for="savingsDate">Date</label>
-            <input type="date" class="date-picker" id="savingsDate" required>
+            <label for="savingsDate">Date (Between 01-09-2026 and 30-12-2026)</label>
+            <input type="date" class="date-picker" id="savingsDate" min="2026-09-01" max="2026-12-30" required>
           </div>
           <button type="submit" class="btn-submit">Record Savings Deposit</button>
         </form>
       </div>
 
-      <!-- Tab 3: Loans -->
+      <!-- Tab 2: Loans -->
       <div id="loanTab" class="tab-content">
         <form id="loanForm" class="admin-grid">
           <div class="form-group">
-            <label for="loanMemberId">Member ID</label>
-            <input type="text" id="loanMemberId" required>
+            <label for="loanMemberId">Member National ID Number</label>
+            <input type="text" id="loanMemberId" placeholder="Type National ID Number..." required>
+            <div id="loanMemberNamePreview" class="member-preview"></div>
           </div>
           <div class="form-group">
             <label for="loanType">Transaction Type</label>
@@ -349,18 +475,78 @@
           </div>
           <div class="form-group">
             <label for="loanDate">Date</label>
-            <input type="date" class="date-picker" id="loanDate" required>
+            <input type="date" class="date-picker" id="loanDate" min="2026-09-01" max="2026-12-30" required>
           </div>
           <button type="submit" class="btn-submit">Save Loan Transaction</button>
         </form>
       </div>
+
+      <!-- Tab 3: All Members -->
+      <div id="allMembersTab" class="tab-content">
+        
+        <!-- Admin Summary Cards -->
+        <div class="stats-grid" style="margin-bottom:16px;">
+          <div class="stat-card">
+            <h3>Total Members</h3>
+            <p id="adminTotalMembersCount">0</p>
+          </div>
+          <div class="stat-card accent">
+            <h3>Total Savings</h3>
+            <p id="adminTotalSavingsSum">KES 0.00</p>
+          </div>
+          <div class="stat-card">
+            <h3>Total Active Loans</h3>
+            <p id="adminTotalLoansSum">KES 0.00</p>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <h3 style="font-size:1rem; color:var(--primary-color);">Member Directory</h3>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-assign-ids" onclick="assignMemberNumbersToExisting()">⚡ Auto-Assign IDs to Existing</button>
+            <button class="btn-add-member" onclick="openAddMemberModal()">+ Add New Member</button>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Member ID</th>
+                <th>National ID</th>
+                <th>Full Name</th>
+                <th>Phone No.</th>
+                <th class="text-right">Savings</th>
+                <th class="text-right">Loan Bal.</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="allMembersTableBody">
+              <tr>
+                <td colspan="8" class="empty-state">Loading members list...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
-    <!-- MEMBER SEARCH SECTION -->
+    <!-- PAYBILL DISPLAY BANNER -->
+    <div class="paybill-card">
+      <div class="paybill-title">📲 Payment Details via M-PESA</div>
+      <div class="paybill-details">
+        <div class="paybill-pill">Paybill No: <strong>400200</strong></div>
+        <div class="paybill-pill">Account No: <strong>40056034</strong></div>
+      </div>
+    </div>
+
+    <!-- MEMBER SEARCH SECTION (Restricted to National ID No. ONLY) -->
     <div class="search-card">
       <div class="search-box">
-        <input type="text" id="memberSearchInput">
-        <button id="searchBtn" style="background:var(--secondary-color); color:white; border:none; border-radius:8px; padding:0 18px; font-weight:600; cursor:pointer;">Search</button>
+        <input type="text" id="memberSearchInput" placeholder="Enter your National ID Number (e.g. 12345678)...">
+        <button id="searchBtn" style="background:var(--secondary-color); color:white; border:none; border-radius:8px; padding:0 18px; font-weight:600; cursor:pointer;">Search Statement</button>
       </div>
     </div>
 
@@ -372,7 +558,7 @@
           <p id="memberNameDisplay">--</p>
         </div>
         <div class="stat-card">
-          <h3>Member ID</h3>
+          <h3>Member No. / Nat. ID</h3>
           <p id="memberIdDisplay">--</p>
         </div>
         <div class="stat-card accent">
@@ -403,7 +589,7 @@
           </thead>
           <tbody id="transactionTableBody">
             <tr>
-              <td colspan="5" class="empty-state">Enter Member ID or Name above to display statement.</td>
+              <td colspan="5" class="empty-state">Enter National ID No. above to display statement.</td>
             </tr>
           </tbody>
         </table>
@@ -411,10 +597,77 @@
     </div>
   </div>
 
+  <!-- ADD MEMBER MODAL -->
+  <div id="addMemberModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Register New Member</h3>
+        <button class="close-btn" onclick="closeAddMemberModal()">&times;</button>
+      </div>
+      <form id="addMemberForm" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="form-group">
+          <label for="newNationalId">National ID Number</label>
+          <input type="text" id="newNationalId" placeholder="e.g., 28394012" required>
+        </div>
+        <div class="form-group">
+          <label for="newMemberId">Membership No. (Auto-Assigned)</label>
+          <input type="text" id="newMemberId" readonly placeholder="Generating ID...">
+        </div>
+        <div class="form-group">
+          <label for="newMemberName">Member Full Name</label>
+          <input type="text" id="newMemberName" placeholder="e.g. JOHN DOE" required>
+        </div>
+        <div class="form-group">
+          <label for="newMemberPhone">Phone Number</label>
+          <input type="tel" id="newMemberPhone" placeholder="e.g., 0712345678" required>
+        </div>
+        <div class="form-group">
+          <label for="regFee">Registration Fee (KES)</label>
+          <input type="number" id="regFee" min="0" required>
+        </div>
+        <div class="form-group">
+          <label for="addMemberDate">Registration Date</label>
+          <input type="date" class="date-picker" id="addMemberDate" min="2026-09-01" max="2026-12-30" required>
+        </div>
+        <button type="submit" class="btn-submit">Register Member</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT MEMBER MODAL -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Edit Member Details</h3>
+        <button class="close-btn" onclick="closeEditModal()">&times;</button>
+      </div>
+      <form id="editMemberForm">
+        <input type="hidden" id="editDbKey">
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="editNationalId">National ID Number</label>
+          <input type="text" id="editNationalId" required>
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="editMemberId">Membership Number</label>
+          <input type="text" id="editMemberId" required>
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="editMemberName">Full Name</label>
+          <input type="text" id="editMemberName" required>
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label for="editMemberPhone">Phone Number</label>
+          <input type="tel" id="editMemberPhone" required>
+        </div>
+        <button type="submit" class="btn-submit">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Firebase Integration Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-    import { getDatabase, ref, get, set, child } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+    import { getDatabase, ref, get, set, update, child } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB9yLNm68mEK4PzO1wj5_jCWn7qTSiOSm0",
@@ -455,30 +708,181 @@
       }
     });
 
-    // Set all date pickers to today's date
-    const today = new Date().toISOString().split('T')[0];
-    document.querySelectorAll('.date-picker').forEach(input => input.value = today);
+    // Default starting date: 2026-09-01
+    const defaultSavingsStartDate = "2026-09-01";
+    document.querySelectorAll('.date-picker').forEach(input => input.value = defaultSavingsStartDate);
+
+    // Auto-generate next Membership ID (e.g. COT001, COT002)
+    async function generateNextMemberId() {
+      try {
+        const dbRef = ref(db);
+        const snapshot = await get(child(dbRef, `members`));
+        let nextNumber = 1;
+
+        if (snapshot.exists()) {
+          const membersObj = snapshot.val();
+          const count = Object.keys(membersObj).length;
+          nextNumber = count + 1;
+        }
+
+        const autoId = `COT-${String(nextNumber).padStart(4, '0')}`;
+        document.getElementById("newMemberId").value = autoId;
+      } catch (err) {
+        console.error("Error generating Member ID:", err);
+        document.getElementById("newMemberId").value = "COT001";
+      }
+    }
+
+    // Assign sequential Membership IDs to all existing records that lack one
+    window.assignMemberNumbersToExisting = async function() {
+      if (!isAdminLoggedIn) return;
+      if (!confirm("Auto-assign sequential Membership Numbers (e.g. COT001) to all existing members?")) return;
+
+      try {
+        const dbRef = ref(db);
+        const snapshot = await get(child(dbRef, `members`));
+
+        if (!snapshot.exists()) {
+          alert("No members found in the database!");
+          return;
+        }
+
+        const membersObj = snapshot.val();
+        let counter = 1;
+        let updatedCount = 0;
+
+        for (const key in membersObj) {
+          const member = membersObj[key];
+          const assignedId = `COT-${String(counter).padStart(4, '0')}`;
+          
+          if (!member.id || !member.id.startsWith("COT-")) {
+            await update(ref(db, `members/${key}`), { id: assignedId });
+            updatedCount++;
+          }
+          counter++;
+        }
+
+        alert(`Successfully assigned Membership IDs to ${updatedCount} existing members!`);
+        fetchAllMembers();
+      } catch (err) {
+        console.error("Failed to auto-assign IDs:", err);
+        alert("An error occurred while updating member numbers.");
+      }
+    };
+
+    // Modal Add Member logic
+    window.openAddMemberModal = function() {
+      if (!isAdminLoggedIn) return;
+      generateNextMemberId();
+      document.getElementById("addMemberModal").style.display = "flex";
+    };
+
+    window.closeAddMemberModal = function() {
+      document.getElementById("addMemberModal").style.display = "none";
+    };
+
+    // Date range validation function (01-09-2026 to 30-12-2026)
+    function isWithinSavingsPeriod(dateStr) {
+      const selected = new Date(dateStr);
+      const minDate = new Date("2026-09-01");
+      const maxDate = new Date("2026-12-30");
+      return selected >= minDate && selected <= maxDate;
+    }
+
+    // Helper: Strictly search and find member by National ID ONLY
+    async function findMemberByNationalIdOnly(nationalIdQuery) {
+      const dbRef = ref(db);
+      const snapshot = await get(child(dbRef, `members`));
+      
+      if (!snapshot.exists()) return null;
+
+      const membersObj = snapshot.val();
+      const query = nationalIdQuery.trim().toLowerCase();
+
+      // Check key match
+      if (membersObj[query]) return { key: query, data: membersObj[query] };
+
+      // Search matching National ID field strictly
+      for (const key in membersObj) {
+        const m = membersObj[key];
+        if (m.nationalId && String(m.nationalId).trim().toLowerCase() === query) {
+          return { key: key, data: m };
+        }
+      }
+
+      return null;
+    }
+
+    // Live Member Lookup helper for Admin Forms (Strictly via National ID)
+    async function setupMemberLookup(inputId, previewId) {
+      const inputEl = document.getElementById(inputId);
+      const previewEl = document.getElementById(previewId);
+
+      inputEl.addEventListener("input", async () => {
+        const query = inputEl.value.trim();
+        if (!query) {
+          previewEl.innerText = "";
+          previewEl.classList.remove("error");
+          return;
+        }
+
+        try {
+          const match = await findMemberByNationalIdOnly(query);
+          if (match) {
+            previewEl.innerText = `👤 ${match.data.name} (Member ID: ${match.data.id || 'N/A'})`;
+            previewEl.classList.remove("error");
+          } else {
+            previewEl.innerText = "⚠️ Member not found with this National ID";
+            previewEl.classList.add("error");
+          }
+        } catch (err) {
+          console.error("Lookup error:", err);
+        }
+      });
+    }
+
+    setupMemberLookup("savingsMemberId", "savingsMemberNamePreview");
+    setupMemberLookup("loanMemberId", "loanMemberNamePreview");
 
     // Tab Navigation Logic
-    window.switchTab = function(tabId) {
+    window.switchTab = function(tabId, event) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-      event.target.classList.add('active');
+      const targetTabBtn = document.querySelector(`.tab-btn[onclick*="${tabId}"]`);
+      if (targetTabBtn) {
+        targetTabBtn.classList.add('active');
+      }
+
       document.getElementById(tabId).classList.add('active');
+
+      if (tabId === 'allMembersTab') {
+        fetchAllMembers();
+      }
     };
 
     // Helper: Save transaction record to Firebase
-    async function processTransaction(id, desc, amount, date) {
-      const memberRef = ref(db, `members/${id}`);
-      const snapshot = await get(memberRef);
-      
-      if (!snapshot.exists()) {
-        alert("Member ID does not exist! Please add the member first under 'Add Members'.");
+    async function processTransaction(nationalId, desc, amount, date) {
+      if (!isWithinSavingsPeriod(date)) {
+        alert("Transaction date must be between 01-09-2026 and 30-12-2026!");
         return null;
       }
 
-      let memberData = snapshot.val();
+      const match = await findMemberByNationalIdOnly(nationalId);
+      if (!match) {
+        alert("Member not found! Please verify the National ID Number or register the member under 'All Members'.");
+        return null;
+      }
+
+      const key = match.key;
+      let memberData = match.data;
+      const memberRef = ref(db, `members/${key}`);
+
+      if (memberData.status === "Inactive") {
+        alert(`Cannot post transaction! Member ${memberData.name} is currently DEACTIVATED.`);
+        return null;
+      }
+
       if (!memberData.transactions) memberData.transactions = [];
 
       let debit = "-";
@@ -508,28 +912,39 @@
       return memberData;
     }
 
-    // Tab 1 Submit: Add Member
+    // Modal Submit: Add Member
     document.getElementById("addMemberForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!isAdminLoggedIn) return;
 
+      const nationalId = document.getElementById("newNationalId").value.trim();
       const id = document.getElementById("newMemberId").value.trim();
       const name = document.getElementById("newMemberName").value.trim().toUpperCase();
+      const phone = document.getElementById("newMemberPhone").value.trim();
       const regFee = parseFloat(document.getElementById("regFee").value) || 0;
       const date = document.getElementById("addMemberDate").value;
 
+      if (!isWithinSavingsPeriod(date)) {
+        alert("Registration date must be between 01-09-2026 and 30-12-2026!");
+        return;
+      }
+
       try {
-        const memberRef = ref(db, `members/${id}`);
+        const dbKey = nationalId;
+        const memberRef = ref(db, `members/${dbKey}`);
         const snapshot = await get(memberRef);
 
         if (snapshot.exists()) {
-          alert(`Member ID ${id} already exists! Use Savings or Loan tab to post transactions.`);
+          alert(`Member with National ID ${nationalId} already exists!`);
           return;
         }
 
         let newMemberData = {
+          nationalId: nationalId,
           id: id,
           name: name,
+          phone: phone,
+          status: "Active",
           savingsTotal: 0,
           loanBalance: 0,
           transactions: []
@@ -547,32 +962,35 @@
         }
 
         await set(memberRef, newMemberData);
-        alert(`Successfully added Member: ${name} (ID: ${id})`);
+        alert(`Successfully registered Member: ${name}\nNational ID: ${nationalId}\nAssigned Member ID: ${id}`);
         renderMemberData(newMemberData);
         document.getElementById("addMemberForm").reset();
-        document.getElementById("addMemberDate").value = today;
+        document.getElementById("addMemberDate").value = defaultSavingsStartDate;
+        closeAddMemberModal();
+        fetchAllMembers();
       } catch (err) {
         console.error(err);
         alert("Failed to register member.");
       }
     });
 
-    // Tab 2 Submit: Savings
+    // Tab 1 Submit: Savings
     document.getElementById("savingsForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!isAdminLoggedIn) return;
 
-      const id = document.getElementById("savingsMemberId").value.trim();
+      const nationalId = document.getElementById("savingsMemberId").value.trim();
       const amount = parseFloat(document.getElementById("savingsAmount").value);
       const date = document.getElementById("savingsDate").value;
 
       try {
-        const updatedMember = await processTransaction(id, "Savings Deposit", amount, date);
+        const updatedMember = await processTransaction(nationalId, "Savings Deposit", amount, date);
         if (updatedMember) {
-          alert(`Successfully saved KES ${amount} deposit for Member ${id}!`);
+          alert(`Successfully saved KES ${amount} deposit for ${updatedMember.name}!`);
           renderMemberData(updatedMember);
           document.getElementById("savingsForm").reset();
-          document.getElementById("savingsDate").value = today;
+          document.getElementById("savingsMemberNamePreview").innerText = "";
+          document.getElementById("savingsDate").value = defaultSavingsStartDate;
         }
       } catch (err) {
         console.error(err);
@@ -580,23 +998,24 @@
       }
     });
 
-    // Tab 3 Submit: Loans
+    // Tab 2 Submit: Loans
     document.getElementById("loanForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!isAdminLoggedIn) return;
 
-      const id = document.getElementById("loanMemberId").value.trim();
+      const nationalId = document.getElementById("loanMemberId").value.trim();
       const type = document.getElementById("loanType").value;
       const amount = parseFloat(document.getElementById("loanAmount").value);
       const date = document.getElementById("loanDate").value;
 
       try {
-        const updatedMember = await processTransaction(id, type, amount, date);
+        const updatedMember = await processTransaction(nationalId, type, amount, date);
         if (updatedMember) {
-          alert(`Successfully recorded ${type} of KES ${amount} for Member ${id}!`);
+          alert(`Successfully recorded ${type} of KES ${amount} for ${updatedMember.name}!`);
           renderMemberData(updatedMember);
           document.getElementById("loanForm").reset();
-          document.getElementById("loanDate").value = today;
+          document.getElementById("loanMemberNamePreview").innerText = "";
+          document.getElementById("loanDate").value = defaultSavingsStartDate;
         }
       } catch (err) {
         console.error(err);
@@ -604,37 +1023,135 @@
       }
     });
 
-    // Dual-Mode Member Search (ID or Name)
-    async function searchMember() {
-      const query = document.getElementById("memberSearchInput").value.trim().toLowerCase();
-      if (!query) return;
+    // Fetch and display all members in Admin Panel
+    async function fetchAllMembers() {
+      const tbody = document.getElementById("allMembersTableBody");
+      tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Loading members list...</td></tr>`;
 
       try {
         const dbRef = ref(db);
-        
-        const directSnapshot = await get(child(dbRef, `members/${query}`));
-        if (directSnapshot.exists()) {
-          renderMemberData(directSnapshot.val());
-          return;
-        }
+        const snapshot = await get(child(dbRef, `members`));
 
-        const allMembersSnapshot = await get(child(dbRef, `members`));
-        if (allMembersSnapshot.exists()) {
-          const membersObj = allMembersSnapshot.val();
-          const matchedKey = Object.keys(membersObj).find(key => {
-            const member = membersObj[key];
-            const nameMatch = member.name && member.name.toLowerCase().includes(query);
-            const idMatch = member.id && String(member.id).toLowerCase() === query;
-            return nameMatch || idMatch;
-          });
+        if (snapshot.exists()) {
+          const membersObj = snapshot.val();
+          const keys = Object.keys(membersObj);
 
-          if (matchedKey) {
-            renderMemberData(membersObj[matchedKey]);
+          if (keys.length > 0) {
+            let totalSavings = 0;
+            let totalLoans = 0;
+
+            keys.forEach(k => {
+              const m = membersObj[k];
+              totalSavings += (m.savingsTotal || 0);
+              totalLoans += (m.loanBalance || 0);
+            });
+
+            document.getElementById("adminTotalMembersCount").innerText = keys.length;
+            document.getElementById("adminTotalSavingsSum").innerText = `KES ${totalSavings.toLocaleString()}`;
+            document.getElementById("adminTotalLoansSum").innerText = `KES ${totalLoans.toLocaleString()}`;
+
+            tbody.innerHTML = keys.map(k => {
+              const m = membersObj[k];
+              const statusStr = m.status || 'Active';
+              const isInactive = statusStr === 'Inactive';
+              return `
+              <tr>
+                <td><strong>${m.id || 'Not Assigned'}</strong></td>
+                <td>${m.nationalId || k}</td>
+                <td>${m.name || 'N/A'}</td>
+                <td>${m.phone || 'N/A'}</td>
+                <td class="text-right">KES ${(m.savingsTotal || 0).toLocaleString()}</td>
+                <td class="text-right">KES ${(m.loanBalance || 0).toLocaleString()}</td>
+                <td><span class="badge ${isInactive ? 'badge-inactive' : 'badge-active'}">${statusStr}</span></td>
+                <td>
+                  <button class="btn-action btn-edit" onclick="openEditModal('${k}', '${m.id || ''}', '${m.nationalId || k}', '${m.name || ''}', '${m.phone || ''}')">Edit</button>
+                  <button class="btn-action btn-toggle" onclick="toggleStatus('${k}', '${statusStr}')">${isInactive ? 'Activate' : 'Deactivate'}</button>
+                </td>
+              </tr>
+            `;}).join('');
             return;
           }
         }
+        
+        document.getElementById("adminTotalMembersCount").innerText = "0";
+        document.getElementById("adminTotalSavingsSum").innerText = "KES 0.00";
+        document.getElementById("adminTotalLoansSum").innerText = "KES 0.00";
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-state">No members found in database.</td></tr>`;
+      } catch (err) {
+        console.error("Error fetching all members:", err);
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Failed to load members list.</td></tr>`;
+      }
+    }
 
-        renderMemberData(null);
+    // Toggle Member Active/Inactive Status
+    window.toggleStatus = async function(key, currentStatus) {
+      if (!isAdminLoggedIn) return;
+      const newStatus = currentStatus === "Inactive" ? "Active" : "Inactive";
+      if (!confirm(`Are you sure you want to set status to ${newStatus}?`)) return;
+
+      try {
+        await update(ref(db, `members/${key}`), { status: newStatus });
+        alert(`Member status updated to ${newStatus}`);
+        fetchAllMembers();
+      } catch (err) {
+        console.error(err);
+        alert("Failed to update status.");
+      }
+    };
+
+    // Modal Edit Logic
+    window.openEditModal = function(key, memberId, nationalId, name, phone) {
+      if (!isAdminLoggedIn) return;
+      document.getElementById("editDbKey").value = key;
+      document.getElementById("editMemberId").value = memberId;
+      document.getElementById("editNationalId").value = nationalId;
+      document.getElementById("editMemberName").value = name;
+      document.getElementById("editMemberPhone").value = phone;
+      document.getElementById("editModal").style.display = "flex";
+    };
+
+    window.closeEditModal = function() {
+      document.getElementById("editModal").style.display = "none";
+    };
+
+    document.getElementById("editMemberForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!isAdminLoggedIn) return;
+
+      const key = document.getElementById("editDbKey").value;
+      const newMemberId = document.getElementById("editMemberId").value.trim();
+      const newNationalId = document.getElementById("editNationalId").value.trim();
+      const newName = document.getElementById("editMemberName").value.trim().toUpperCase();
+      const newPhone = document.getElementById("editMemberPhone").value.trim();
+
+      try {
+        await update(ref(db, `members/${key}`), {
+          id: newMemberId,
+          nationalId: newNationalId,
+          name: newName,
+          phone: newPhone
+        });
+        alert(`Updated details successfully!`);
+        closeEditModal();
+        fetchAllMembers();
+      } catch (err) {
+        console.error(err);
+        alert("Failed to update member details.");
+      }
+    });
+
+    // Member Search (STRICTLY via National ID No Only)
+    async function searchMember() {
+      const nationalIdQuery = document.getElementById("memberSearchInput").value.trim();
+      if (!nationalIdQuery) return;
+
+      try {
+        const match = await findMemberByNationalIdOnly(nationalIdQuery);
+        if (match) {
+          renderMemberData(match.data);
+        } else {
+          renderMemberData(null);
+        }
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -648,12 +1165,12 @@
         document.getElementById("memberIdDisplay").innerText = "N/A";
         document.getElementById("totalSavingsDisplay").innerText = "KES 0.00";
         document.getElementById("loanBalanceDisplay").innerText = "KES 0.00";
-        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No records found matching your query.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No records found matching entered National ID.</td></tr>`;
         return;
       }
 
-      document.getElementById("memberNameDisplay").innerText = member.name;
-      document.getElementById("memberIdDisplay").innerText = member.id || "N/A";
+      document.getElementById("memberNameDisplay").innerText = `${member.name} (${member.phone || 'No Phone'})`;
+      document.getElementById("memberIdDisplay").innerText = `ID: ${member.nationalId || 'N/A'} / Member No: ${member.id || 'N/A'}`;
       document.getElementById("totalSavingsDisplay").innerText = `KES ${(member.savingsTotal || 0).toLocaleString()}`;
       document.getElementById("loanBalanceDisplay").innerText = `KES ${(member.loanBalance || 0).toLocaleString()}`;
 
