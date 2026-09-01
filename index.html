@@ -520,6 +520,22 @@
     let currentLoggedInMemberKey = null;
     let currentLoggedInMemberData = null;
 
+    // Helper: Get Today's Date formatted as YYYY-MM-DD
+    function getTodayFormatted() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    // Set Default Dates for Form Inputs on Page Load
+    document.addEventListener("DOMContentLoaded", () => {
+      const todayStr = getTodayFormatted();
+      if (document.getElementById("savingsDate")) document.getElementById("savingsDate").value = todayStr;
+      if (document.getElementById("loanDate")) document.getElementById("loanDate").value = todayStr;
+    });
+
     function checkWithdrawalWindow() {
       const today = new Date();
       const day = today.getDate();
@@ -652,7 +668,7 @@
       e.preventDefault();
       const nationalId = document.getElementById("savingsNationalId").value.trim();
       const amount = parseFloat(document.getElementById("savingsAmount").value);
-      const date = document.getElementById("savingsDate").value;
+      const date = document.getElementById("savingsDate").value || getTodayFormatted();
 
       const match = await findMemberByNationalId(nationalId);
       if (!match) {
@@ -675,6 +691,7 @@
       await set(ref(db, `members/${match.key}`), m);
       alert(`Successfully recorded deposit of KES ${amount.toLocaleString()} for National ID ${m.nationalId}`);
       document.getElementById("savingsForm").reset();
+      document.getElementById("savingsDate").value = getTodayFormatted();
     });
 
     // Admin Loan Form
@@ -683,7 +700,7 @@
       const nationalId = document.getElementById("loanNationalId").value.trim();
       const type = document.getElementById("loanType").value;
       const amount = parseFloat(document.getElementById("loanAmount").value);
-      const date = document.getElementById("loanDate").value;
+      const date = document.getElementById("loanDate").value || getTodayFormatted();
 
       const match = await findMemberByNationalId(nationalId);
       if (!match) {
@@ -717,6 +734,7 @@
       await set(ref(db, `members/${match.key}`), m);
       alert(`Loan record updated for National ID ${m.nationalId}`);
       document.getElementById("loanForm").reset();
+      document.getElementById("loanDate").value = getTodayFormatted();
     });
 
     // Change PIN Controls
@@ -772,7 +790,7 @@
         nationalId: currentLoggedInMemberData.nationalId || 'N/A',
         name: currentLoggedInMemberData.name,
         amount: amount,
-        date: new Date().toISOString().split('T')[0],
+        date: getTodayFormatted(),
         status: "Pending"
       });
 
@@ -937,7 +955,7 @@
         if (!m.transactions) m.transactions = [];
 
         m.transactions.push({
-          date: new Date().toISOString().split('T')[0],
+          date: getTodayFormatted(),
           desc: "Savings Withdrawal",
           debit: amount,
           credit: "-",
