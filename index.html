@@ -17,23 +17,9 @@
       --success-color: #27ae60;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      padding: 16px;
-    }
-
-    .container {
-      max-width: 980px;
-      margin: 0 auto;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-color); padding: 16px; }
+    .container { max-width: 980px; margin: 0 auto; }
 
     header {
       background-color: var(--primary-color);
@@ -46,17 +32,7 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    header h1 {
-      font-size: 1.6rem;
-      margin-bottom: 4px;
-    }
-
-    .auth-bar {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-    }
-
+    .auth-bar { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; }
     .auth-btn {
       background: rgba(255, 255, 255, 0.2);
       color: white;
@@ -67,9 +43,17 @@
       cursor: pointer;
       font-weight: 600;
     }
+    .auth-btn:hover { background: rgba(255, 255, 255, 0.3); }
 
-    .auth-btn:hover {
-      background: rgba(255, 255, 255, 0.3);
+    /* Login Card */
+    .login-card {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      max-width: 420px;
+      margin: 30px auto;
+      border-top: 4px solid var(--primary-color);
     }
 
     /* Paybill Card Styling */
@@ -85,33 +69,17 @@
       flex-wrap: wrap;
       gap: 10px;
     }
-
-    .paybill-title {
-      font-weight: bold;
-      color: #1b5e20;
-      font-size: 0.95rem;
-    }
-
-    .paybill-details {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-
+    .paybill-title { font-weight: bold; color: #1b5e20; font-size: 0.95rem; }
+    .paybill-details { display: flex; gap: 15px; flex-wrap: wrap; }
     .paybill-pill {
       background: #ffffff;
       padding: 6px 14px;
       border-radius: 20px;
       font-size: 0.9rem;
       border: 1px solid #c8e6c9;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
-    .paybill-pill strong {
-      color: #2e7d32;
-    }
-
-    /* Admin Card & Tab System */
+    /* Admin Card & Tabs */
     .admin-card {
       display: none;
       background: var(--card-bg);
@@ -122,294 +90,59 @@
       border-top: 4px solid var(--accent-color);
     }
 
-    .admin-card h2 {
-      font-size: 1.1rem;
-      color: var(--primary-color);
-      margin-bottom: 14px;
-    }
+    .admin-tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; flex-wrap: wrap; }
+    .tab-btn { background: #e9ecef; color: var(--text-color); border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+    .tab-btn.active { background: var(--primary-color); color: white; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
 
-    .admin-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      border-bottom: 2px solid var(--border-color);
-      padding-bottom: 8px;
-      flex-wrap: wrap;
-    }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group label { font-size: 0.85rem; font-weight: 600; color: #555; }
+    input, select, button { padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.95rem; outline: none; }
+    input[readonly] { background-color: #e9ecef; color: #555; cursor: not-allowed; }
 
-    .tab-btn {
-      background: #e9ecef;
-      color: var(--text-color);
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: all 0.2s;
-    }
+    .btn-submit { background-color: var(--secondary-color); color: white; border: none; font-weight: 600; cursor: pointer; margin-top: 8px; width: 100%; }
+    .btn-submit:hover { background-color: var(--primary-color); }
+    .btn-danger { background-color: var(--danger-color); color: white; }
 
-    .tab-btn.active {
-      background: var(--primary-color);
-      color: white;
-    }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .stat-card { background: var(--card-bg); padding: 16px; border-radius: 12px; border-left: 5px solid var(--secondary-color); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .stat-card.accent { border-left-color: var(--accent-color); }
+    .stat-card.target { border-left-color: #9b59b6; }
+    .stat-card h3 { font-size: 0.8rem; color: #666; text-transform: uppercase; }
+    .stat-card p { font-size: 1.3rem; font-weight: bold; color: var(--primary-color); margin-top: 4px; }
 
-    .tab-content {
-      display: none;
-    }
+    .statement-section { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .statement-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
 
-    .tab-content.active {
-      display: block;
-    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+    th { background-color: #f8f9fa; color: #555; }
+    .text-right { text-align: right; }
+    .empty-state { text-align: center; padding: 30px; color: #888; }
 
-    .admin-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .form-group label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #555;
-    }
-
-    .member-preview {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--secondary-color);
-      margin-top: 2px;
-      min-height: 1.2em;
-    }
-
-    .member-preview.error {
-      color: var(--danger-color);
-    }
-
-    input, select, button {
-      padding: 10px 14px;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      font-size: 0.95rem;
-      outline: none;
-    }
-
-    input[readonly] {
-      background-color: #e9ecef;
-      color: #555;
-      cursor: not-allowed;
-      font-weight: bold;
-    }
-
-    input:focus, select:focus {
-      border-color: var(--secondary-color);
-    }
-
-    .btn-submit {
-      background-color: var(--secondary-color);
-      color: white;
-      border: none;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 8px;
-      grid-column: 1 / -1;
-      transition: background 0.2s;
-      width: 100%;
-    }
-
-    .btn-submit:hover {
-      background-color: var(--primary-color);
-    }
-
-    .search-card {
-      background: var(--card-bg);
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      margin-bottom: 20px;
-    }
-
-    .search-box {
-      display: flex;
-      gap: 10px;
-    }
-
-    .search-box input {
-      flex: 1;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-
-    .stat-card {
-      background: var(--card-bg);
-      padding: 16px;
-      border-radius: 12px;
-      border-left: 5px solid var(--secondary-color);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    .stat-card.accent {
-      border-left-color: var(--accent-color);
-    }
-
-    .stat-card h3 {
-      font-size: 0.8rem;
-      color: #666;
-      text-transform: uppercase;
-    }
-
-    .stat-card p {
-      font-size: 1.3rem;
-      font-weight: bold;
-      color: var(--primary-color);
-      margin-top: 4px;
-    }
-
-    .statement-section {
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    .statement-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 10px 12px;
-      text-align: left;
-      border-bottom: 1px solid var(--border-color);
-      font-size: 0.9rem;
-    }
-
-    th {
-      background-color: #f8f9fa;
-      color: #555;
-    }
-
-    .text-right {
-      text-align: right;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 30px;
-      color: #888;
-    }
-
-    /* Action Buttons & Status Badges */
-    .badge {
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: bold;
-      display: inline-block;
-    }
+    .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
     .badge-active { background-color: #e8f8f0; color: var(--success-color); }
-    .badge-inactive { background-color: #fde8e8; color: var(--danger-color); }
+    .badge-pending { background-color: #fef9e7; color: #f39c12; }
 
-    .btn-action {
-      padding: 4px 8px;
-      font-size: 0.8rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 600;
-      margin-right: 4px;
-    }
-    .btn-edit { background: #3498db; color: white; }
-    .btn-toggle { background: #e67e22; color: white; }
-    .btn-add-member {
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    .btn-add-member:hover {
-      background: var(--secondary-color);
-    }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: var(--card-bg); padding: 24px; border-radius: 12px; width: 90%; max-width: 450px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .close-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #777; }
 
-    .btn-assign-ids {
-      background: var(--accent-color);
-      color: #333;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    .btn-assign-ids:hover {
-      opacity: 0.9;
-    }
-
-    /* Modal Styling */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background: var(--card-bg);
-      padding: 24px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 450px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-
-    .modal-header {
+    .withdraw-banner {
+      background: #fef9e7;
+      border: 1px solid #f1c40f;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
     }
 
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: 1.2rem;
-      cursor: pointer;
-      color: #777;
-    }
-
-    @media print {
-      body { background: white; padding: 0; }
-      .admin-card, .search-card, .paybill-card, .auth-bar, .modal, button { display: none !important; }
-      .statement-section { box-shadow: none; padding: 0; }
-    }
+    .btn-action-group { display: flex; gap: 4px; }
   </style>
 </head>
 <body>
@@ -417,153 +150,169 @@
   <div class="container">
     <header>
       <div class="auth-bar">
+        <button id="memberLogoutBtn" class="auth-btn" style="display:none;" onclick="memberLogout()">Logout</button>
         <button id="authToggleBtn" class="auth-btn">Admin Login</button>
       </div>
-      <h1>Circle of Trust (SEARCH COT)</h1>
-      <p>Member Portal & Statement Viewer</p>
+      <h1>Circle of Trust (COT)</h1>
+      <p>Member Portal & Savings System</p>
     </header>
+
+    <!-- MEMBER LOGIN CARD -->
+    <div id="memberLoginSection" class="login-card">
+      <h2 style="font-size: 1.2rem; margin-bottom: 14px; color: var(--primary-color);">🔑 Member Login</h2>
+      <form id="memberLoginForm" style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="form-group">
+          <label>National ID Number</label>
+          <input type="text" id="loginNationalId" placeholder="Enter National ID..." required>
+        </div>
+        <div class="form-group">
+          <label>My PIN</label>
+          <input type="password" id="loginPassword" maxlength="4" required>
+        </div>
+        <button type="submit" class="btn-submit">Login to Portal</button>
+      </form>
+    </div>
 
     <!-- ADMIN PANEL -->
     <div id="adminPanel" class="admin-card">
       <h2>🔒 Admin Control Panel</h2>
-      
-      <!-- Tab Controls -->
       <div class="admin-tabs">
-        <button class="tab-btn active" id="tabBtnSavings" onclick="switchTab('savingsTab', event)">Savings</button>
-        <button class="tab-btn" id="tabBtnLoan" onclick="switchTab('loanTab', event)">Loans</button>
-        <button class="tab-btn" id="tabBtnAllMembers" onclick="switchTab('allMembersTab', event)">All Members</button>
+        <button class="tab-btn active" onclick="switchTab('savingsTab', event)">Savings</button>
+        <button class="tab-btn" onclick="switchTab('loanTab', event)">Loans</button>
+        <button class="tab-btn" onclick="switchTab('withdrawalsTab', event)">Withdrawal Requests</button>
+        <button class="tab-btn" onclick="switchTab('allMembersTab', event)">All Members</button>
       </div>
 
-      <!-- Tab 1: Savings -->
+      <!-- Admin Tab 1: Savings -->
       <div id="savingsTab" class="tab-content active">
         <form id="savingsForm" class="admin-grid">
           <div class="form-group">
-            <label for="savingsMemberId">Member National ID Number</label>
-            <input type="text" id="savingsMemberId" placeholder="Type National ID Number..." required>
-            <div id="savingsMemberNamePreview" class="member-preview"></div>
+            <label>Member National ID</label>
+            <input type="text" id="savingsMemberId" placeholder="Type National ID..." required>
           </div>
           <div class="form-group">
-            <label for="savingsAmount">Savings Deposit Amount (KES)</label>
+            <label>Savings Deposit Amount (KES)</label>
             <input type="number" id="savingsAmount" min="1" required>
           </div>
           <div class="form-group">
-            <label for="savingsDate">Date (Between 01-09-2026 and 30-12-2026)</label>
-            <input type="date" class="date-picker" id="savingsDate" min="2026-09-01" max="2026-12-30" required>
+            <label>Date</label>
+            <input type="date" id="savingsDate" required>
           </div>
           <button type="submit" class="btn-submit">Record Savings Deposit</button>
         </form>
       </div>
 
-      <!-- Tab 2: Loans -->
+      <!-- Admin Tab 2: Loans -->
       <div id="loanTab" class="tab-content">
         <form id="loanForm" class="admin-grid">
           <div class="form-group">
-            <label for="loanMemberId">Member National ID Number</label>
-            <input type="text" id="loanMemberId" placeholder="Type National ID Number..." required>
-            <div id="loanMemberNamePreview" class="member-preview"></div>
+            <label>Member National ID</label>
+            <input type="text" id="loanMemberId" placeholder="Type National ID..." required>
           </div>
           <div class="form-group">
-            <label for="loanType">Transaction Type</label>
+            <label>Transaction Type</label>
             <select id="loanType">
               <option value="Loan Issued">Issue New Loan</option>
               <option value="Loan Repayment">Record Loan Repayment</option>
             </select>
           </div>
           <div class="form-group">
-            <label for="loanAmount">Amount (KES)</label>
+            <label>Amount (KES)</label>
             <input type="number" id="loanAmount" min="1" required>
           </div>
           <div class="form-group">
-            <label for="loanDate">Date</label>
-            <input type="date" class="date-picker" id="loanDate" min="2026-09-01" max="2026-12-30" required>
+            <label>Date</label>
+            <input type="date" id="loanDate" required>
           </div>
           <button type="submit" class="btn-submit">Save Loan Transaction</button>
         </form>
       </div>
 
-      <!-- Tab 3: All Members -->
+      <!-- Admin Tab 3: Withdrawal Requests -->
+      <div id="withdrawalsTab" class="tab-content">
+        <h3 style="font-size:1rem; margin-bottom:12px; color:var(--primary-color);">Pending Member Withdrawal Requests</h3>
+        <table style="width:100%;">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Member Name</th>
+              <th>National ID</th>
+              <th class="text-right">Requested Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminWithdrawalsTableBody">
+            <tr><td colspan="6" class="empty-state">No pending requests.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Admin Tab 4: All Members -->
       <div id="allMembersTab" class="tab-content">
-        
-        <!-- Admin Summary Cards -->
-        <div class="stats-grid" style="margin-bottom:16px;">
-          <div class="stat-card">
-            <h3>Total Members</h3>
-            <p id="adminTotalMembersCount">0</p>
-          </div>
-          <div class="stat-card accent">
-            <h3>Total Savings</h3>
-            <p id="adminTotalSavingsSum">KES 0.00</p>
-          </div>
-          <div class="stat-card">
-            <h3>Total Active Loans</h3>
-            <p id="adminTotalLoansSum">KES 0.00</p>
-          </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px; align-items:center;">
+          <h3>Member Directory</h3>
+          <button class="btn-submit" style="width:auto; margin:0;" onclick="openAddMemberModal()">+ Add New Member</button>
         </div>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
-          <h3 style="font-size:1rem; color:var(--primary-color);">Member Directory</h3>
-          <div style="display:flex; gap:8px;">
-            <button class="btn-assign-ids" onclick="assignMemberNumbersToExisting()">⚡ Auto-Assign IDs to Existing</button>
-            <button class="btn-add-member" onclick="openAddMemberModal()">+ Add New Member</button>
-          </div>
-        </div>
-
-        <div style="overflow-x: auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Member ID</th>
-                <th>National ID</th>
-                <th>Full Name</th>
-                <th>Phone No.</th>
-                <th class="text-right">Savings</th>
-                <th class="text-right">Loan Bal.</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="allMembersTableBody">
-              <tr>
-                <td colspan="8" class="empty-state">Loading members list...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- PAYBILL DISPLAY BANNER -->
-    <div class="paybill-card">
-      <div class="paybill-title">📲 Payment Details via M-PESA</div>
-      <div class="paybill-details">
-        <div class="paybill-pill">Paybill No: <strong>400200</strong></div>
-        <div class="paybill-pill">Account No: <strong>40056034</strong></div>
+        <table>
+          <thead>
+            <tr>
+              <th>National ID</th>
+              <th>Full Name</th>
+              <th>Phone No.</th>
+              <th class="text-right">Target (Monthly)</th>
+              <th class="text-right">Savings</th>
+              <th class="text-right">Loan Bal.</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="allMembersTableBody">
+            <tr><td colspan="7" class="empty-state">Click 'All Members' tab to refresh directory...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- MEMBER SEARCH SECTION (Restricted to National ID No. ONLY) -->
-    <div class="search-card">
-      <div class="search-box">
-        <input type="text" id="memberSearchInput" placeholder="Enter your National ID Number (e.g. 12345678)...">
-        <button id="searchBtn" style="background:var(--secondary-color); color:white; border:none; border-radius:8px; padding:0 18px; font-weight:600; cursor:pointer;">Search Statement</button>
+    <!-- MEMBER PORTAL DASHBOARD -->
+    <div id="portalContent" style="display: none;">
+      <div class="paybill-card">
+        <div class="paybill-title">📲 Payment Details via M-PESA</div>
+        <div class="paybill-details">
+          <div class="paybill-pill">Paybill No: <strong>400200</strong></div>
+          <div class="paybill-pill">Account No: <strong>40056034</strong></div>
+        </div>
       </div>
-    </div>
 
-    <!-- MEMBER STATEMENT DISPLAY -->
-    <div id="portalContent">
+      <!-- WITHDRAWAL WINDOW BANNER -->
+      <div class="withdraw-banner">
+        <div>
+          <strong>📅 Monthly Withdrawal Window:</strong> 
+          <span id="withdrawWindowStatus">Active only on the 28th & 29th of every month.</span>
+        </div>
+        <button id="withdrawBtn" disabled onclick="openWithdrawModal()" style="background:var(--primary-color); color:white; font-weight:bold; cursor:pointer;">Withdraw Funds</button>
+      </div>
+
       <div class="stats-grid">
         <div class="stat-card">
           <h3>Member Name</h3>
           <p id="memberNameDisplay">--</p>
+          <div style="margin-top:6px;">
+            <button onclick="openChangePinModal()" style="font-size:0.75rem; padding:3px 8px; cursor:pointer;">Change PIN</button>
+          </div>
         </div>
         <div class="stat-card">
-          <h3>Member No. / Nat. ID</h3>
+          <h3>National ID</h3>
           <p id="memberIdDisplay">--</p>
         </div>
         <div class="stat-card accent">
           <h3>Total Savings</h3>
           <p id="totalSavingsDisplay">KES 0.00</p>
+        </div>
+        <div class="stat-card target">
+          <h3>Monthly Saving Target</h3>
+          <p id="savingTargetDisplay">KES 0.00</p>
+          <small id="weeklyTargetDisplay" style="color:#777;">Weekly Target: KES 0.00</small>
+          <button onclick="openTargetModal()" style="margin-top:6px; font-size:0.75rem; padding:3px 8px; cursor:pointer;">Set Target</button>
         </div>
         <div class="stat-card">
           <h3>Active Loan</h3>
@@ -576,7 +325,6 @@
           <h2>Member Statement</h2>
           <button onclick="window.print()" style="background:transparent; border:1px solid var(--secondary-color); color:var(--secondary-color); padding:4px 12px; border-radius:6px; font-weight:600; cursor:pointer;">Print Statement</button>
         </div>
-
         <table>
           <thead>
             <tr>
@@ -588,37 +336,69 @@
             </tr>
           </thead>
           <tbody id="transactionTableBody">
-            <tr>
-              <td colspan="5" class="empty-state">Enter National ID No. above to display statement.</td>
-            </tr>
+            <tr><td colspan="5" class="empty-state">No transaction history.</td></tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- ADMIN LOGIN MODAL -->
-  <div id="loginModal" class="modal">
+  <!-- MODAL: WITHDRAWAL REQUEST -->
+  <div id="withdrawModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Admin Authentication</h3>
-        <button class="close-btn" onclick="closeLoginModal()">&times;</button>
+        <h3>Request Savings Withdrawal</h3>
+        <button class="close-btn" onclick="closeWithdrawModal()">&times;</button>
       </div>
-      <form id="loginForm" style="display:flex; flex-direction:column; gap:12px;">
+      <form id="withdrawForm" style="display:flex; flex-direction:column; gap:12px;">
         <div class="form-group">
-          <label for="adminEmail">Admin Email</label>
-          <input type="email" id="adminEmail" placeholder="e.g. admin@circleoftrust.com" required>
+          <label>Amount to Withdraw (KES)</label>
+          <input type="number" id="withdrawAmount" min="1" required>
         </div>
-        <div class="form-group">
-          <label for="adminPassword">Admin Password</label>
-          <input type="password" id="adminPassword" placeholder="Enter your password" required>
-        </div>
-        <button type="submit" class="btn-submit">Login</button>
+        <button type="submit" class="btn-submit">Submit Withdrawal Request</button>
       </form>
     </div>
   </div>
 
-  <!-- ADD MEMBER MODAL -->
+  <!-- MODAL: MEMBER UPDATE TARGET -->
+  <div id="targetModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Update Monthly Saving Target</h3>
+        <button class="close-btn" onclick="closeTargetModal()">&times;</button>
+      </div>
+      <form id="targetForm" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="form-group">
+          <label>Target Amount per Month (KES)</label>
+          <input type="number" id="targetAmountInput" min="100" required>
+        </div>
+        <button type="submit" class="btn-submit">Save Target</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CHANGE PIN (IN PORTAL) -->
+  <div id="changePinModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Change Security PIN</h3>
+        <button class="close-btn" onclick="closeChangePinModal()">&times;</button>
+      </div>
+      <form id="changePinForm" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="form-group">
+          <label>Current PIN</label>
+          <input type="password" id="currentPin" maxlength="4" required>
+        </div>
+        <div class="form-group">
+          <label>New 4-Digit PIN</label>
+          <input type="password" id="newPin" maxlength="4" pattern="\d{4}" title="Must be a 4-digit number" required>
+        </div>
+        <button type="submit" class="btn-submit">Update PIN</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN ADD MEMBER -->
   <div id="addMemberModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -627,69 +407,61 @@
       </div>
       <form id="addMemberForm" style="display:flex; flex-direction:column; gap:12px;">
         <div class="form-group">
-          <label for="newNationalId">National ID Number</label>
-          <input type="text" id="newNationalId" placeholder="e.g., 28394012" required>
+          <label>National ID Number</label>
+          <input type="text" id="newNationalId" required>
         </div>
         <div class="form-group">
-          <label for="newMemberId">Membership No. (Auto-Assigned)</label>
-          <input type="text" id="newMemberId" readonly placeholder="Generating ID...">
+          <label>Member Full Name</label>
+          <input type="text" id="newMemberName" required>
         </div>
         <div class="form-group">
-          <label for="newMemberName">Member Full Name</label>
-          <input type="text" id="newMemberName" placeholder="e.g. JOHN DOE" required>
+          <label>Phone Number</label>
+          <input type="tel" id="newMemberPhone" required>
         </div>
         <div class="form-group">
-          <label for="newMemberPhone">Phone Number</label>
-          <input type="tel" id="newMemberPhone" placeholder="e.g., 0712345678" required>
+          <label>Monthly Saving Target (KES)</label>
+          <input type="number" id="newMemberTarget" min="0" placeholder="e.g. 5000" required>
         </div>
-        <div class="form-group">
-          <label for="regFee">Registration Fee (KES)</label>
-          <input type="number" id="regFee" min="0" required>
-        </div>
-        <div class="form-group">
-          <label for="addMemberDate">Registration Date</label>
-          <input type="date" class="date-picker" id="addMemberDate" min="2026-09-01" max="2026-12-30" required>
-        </div>
+        <div style="font-size:0.8rem; color:#666; margin-top:-4px;">* Default PIN will be automatically set to: <strong>0000</strong></div>
         <button type="submit" class="btn-submit">Register Member</button>
       </form>
     </div>
   </div>
 
-  <!-- EDIT MEMBER MODAL -->
-  <div id="editModal" class="modal">
+  <!-- MODAL: ADMIN EDIT MEMBER DETAILS -->
+  <div id="adminEditMemberModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Edit Member Details</h3>
-        <button class="close-btn" onclick="closeEditModal()">&times;</button>
+        <h3>Admin: Edit Member Details</h3>
+        <button class="close-btn" onclick="closeAdminEditMemberModal()">&times;</button>
       </div>
-      <form id="editMemberForm">
-        <input type="hidden" id="editDbKey">
-        <div class="form-group" style="margin-bottom:12px;">
-          <label for="editNationalId">National ID Number</label>
-          <input type="text" id="editNationalId" required>
+      <form id="adminEditMemberForm" style="display:flex; flex-direction:column; gap:12px;">
+        <input type="hidden" id="adminEditMemberKey">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="adminEditMemberName" required>
         </div>
-        <div class="form-group" style="margin-bottom:12px;">
-          <label for="editMemberId">Membership Number</label>
-          <input type="text" id="editMemberId" required>
+        <div class="form-group">
+          <label>National ID Number</label>
+          <input type="text" id="adminEditNationalId" required>
         </div>
-        <div class="form-group" style="margin-bottom:12px;">
-          <label for="editMemberName">Full Name</label>
-          <input type="text" id="editMemberName" required>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="adminEditMemberPhone" required>
         </div>
-        <div class="form-group" style="margin-bottom:16px;">
-          <label for="editMemberPhone">Phone Number</label>
-          <input type="tel" id="editMemberPhone" required>
+        <div class="form-group">
+          <label>Monthly Target (KES)</label>
+          <input type="number" id="adminEditMemberTarget" min="0" required>
         </div>
-        <button type="submit" class="btn-submit">Save Changes</button>
+        <button type="submit" class="btn-submit">Update Details</button>
       </form>
     </div>
   </div>
 
-  <!-- Firebase Integration Script -->
+  <!-- FIREBASE INTEGRATION MODULE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
     import { getDatabase, ref, get, set, update, child } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB9yLNm68mEK4PzO1wj5_jCWn7qTSiOSm0",
@@ -703,528 +475,102 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const auth = getAuth(app);
 
-    let currentUser = null;
+    const ADMIN_PASSKEY = "cotadmin";
+    let isAdminLoggedIn = false;
+    let currentLoggedInMemberKey = null;
+    let currentLoggedInMemberData = null;
 
-    const authBtn = document.getElementById("authToggleBtn");
-    const adminPanel = document.getElementById("adminPanel");
-    const loginModal = document.getElementById("loginModal");
+    // Check 28th - 29th Withdrawal Window Activation
+    function checkWithdrawalWindow() {
+      const today = new Date();
+      const day = today.getDate();
+      const withdrawBtn = document.getElementById("withdrawBtn");
+      const statusText = document.getElementById("withdrawWindowStatus");
 
-    // Track state securely via Firebase Auth listener
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        currentUser = user;
-        adminPanel.style.display = "block";
-        authBtn.innerText = "Admin Logout";
-        authBtn.style.background = "var(--danger-color)";
+      if (day === 28 || day === 29) {
+        withdrawBtn.disabled = false;
+        statusText.innerText = "OPEN NOW (28th - 29th Active Window)";
+        statusText.style.color = "var(--success-color)";
+        statusText.style.fontWeight = "bold";
       } else {
-        currentUser = null;
-        adminPanel.style.display = "none";
-        authBtn.innerText = "Admin Login";
-        authBtn.style.background = "rgba(255, 255, 255, 0.2)";
-      }
-    });
-
-    authBtn.addEventListener("click", () => {
-      if (!currentUser) {
-        loginModal.style.display = "flex";
-      } else {
-        signOut(auth).then(() => {
-          alert("Logged out successfully.");
-        }).catch((err) => {
-          console.error("Logout Error:", err);
-        });
-      }
-    });
-
-    window.closeLoginModal = function() {
-      loginModal.style.display = "none";
-    };
-
-    // Firebase Backend Authentication Handler
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("adminEmail").value.trim();
-      const password = document.getElementById("adminPassword").value.trim();
-
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        alert("Admin Login Successful!");
-        closeLoginModal();
-        document.getElementById("loginForm").reset();
-      } catch (error) {
-        console.error("Authentication Failed:", error);
-        alert("Invalid Email or Password!");
-      }
-    });
-
-    // Default starting date: 2026-09-01
-    const defaultSavingsStartDate = "2026-09-01";
-    document.querySelectorAll('.date-picker').forEach(input => input.value = defaultSavingsStartDate);
-
-    // Auto-generate next Membership ID (e.g. COT-0001, COT-0002)
-    async function generateNextMemberId() {
-      try {
-        const dbRef = ref(db);
-        const snapshot = await get(child(dbRef, `members`));
-        let nextNumber = 1;
-
-        if (snapshot.exists()) {
-          const membersObj = snapshot.val();
-          const count = Object.keys(membersObj).length;
-          nextNumber = count + 1;
-        }
-
-        const autoId = `COT-${String(nextNumber).padStart(4, '0')}`;
-        document.getElementById("newMemberId").value = autoId;
-      } catch (err) {
-        console.error("Error generating Member ID:", err);
-        document.getElementById("newMemberId").value = "COT-0001";
+        withdrawBtn.disabled = true;
+        statusText.innerText = "CLOSED (Activates on 28th and 29th of every month)";
       }
     }
 
-    // Assign sequential Membership IDs to all existing records that lack one
-    window.assignMemberNumbersToExisting = async function() {
-      if (!currentUser) return;
-      if (!confirm("Auto-assign sequential Membership Numbers (e.g. COT-0001) to all existing members?")) return;
-
-      try {
-        const dbRef = ref(db);
-        const snapshot = await get(child(dbRef, `members`));
-
-        if (!snapshot.exists()) {
-          alert("No members found in the database!");
-          return;
-        }
-
-        const membersObj = snapshot.val();
-        let counter = 1;
-        let updatedCount = 0;
-
-        for (const key in membersObj) {
-          const member = membersObj[key];
-          const assignedId = `COT-${String(counter).padStart(4, '0')}`;
-          
-          if (!member.id || !member.id.startsWith("COT-")) {
-            await update(ref(db, `members/${key}`), { id: assignedId });
-            updatedCount++;
-          }
-          counter++;
-        }
-
-        alert(`Successfully assigned Membership IDs to ${updatedCount} existing members!`);
-        fetchAllMembers();
-      } catch (err) {
-        console.error("Failed to auto-assign IDs:", err);
-        alert("An error occurred while updating member numbers.");
-      }
-    };
-
-    // Modal Add Member logic
-    window.openAddMemberModal = function() {
-      if (!currentUser) return;
-      generateNextMemberId();
-      document.getElementById("addMemberModal").style.display = "flex";
-    };
-
-    window.closeAddMemberModal = function() {
-      document.getElementById("addMemberModal").style.display = "none";
-    };
-
-    // Date range validation function (01-09-2026 to 30-12-2026)
-    function isWithinSavingsPeriod(dateStr) {
-      const selected = new Date(dateStr);
-      const minDate = new Date("2026-09-01");
-      const maxDate = new Date("2026-12-30");
-      return selected >= minDate && selected <= maxDate;
-    }
-
-    // Helper: Strictly search and find member by National ID ONLY
-    async function findMemberByNationalIdOnly(nationalIdQuery) {
+    // Helper: Find member by field match
+    async function findMember(queryInput) {
       const dbRef = ref(db);
       const snapshot = await get(child(dbRef, `members`));
-      
       if (!snapshot.exists()) return null;
 
       const membersObj = snapshot.val();
-      const query = nationalIdQuery.trim().toLowerCase();
+      const query = queryInput.trim().toLowerCase();
 
-      // Check key match
-      if (membersObj[query]) return { key: query, data: membersObj[query] };
-
-      // Search matching National ID field strictly
       for (const key in membersObj) {
         const m = membersObj[key];
-        if (m.nationalId && String(m.nationalId).trim().toLowerCase() === query) {
+        if (
+          key.toLowerCase() === query ||
+          (m.nationalId && String(m.nationalId).trim().toLowerCase() === query)
+        ) {
           return { key: key, data: m };
         }
       }
-
       return null;
     }
 
-    // Live Member Lookup helper for Admin Forms (Strictly via National ID)
-    async function setupMemberLookup(inputId, previewId) {
-      const inputEl = document.getElementById(inputId);
-      const previewEl = document.getElementById(previewId);
+    // Member Login Logic
+    document.getElementById("memberLoginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nationalId = document.getElementById("loginNationalId").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
 
-      inputEl.addEventListener("input", async () => {
-        const query = inputEl.value.trim();
-        if (!query) {
-          previewEl.innerText = "";
-          previewEl.classList.remove("error");
-          return;
-        }
-
-        try {
-          const match = await findMemberByNationalIdOnly(query);
-          if (match) {
-            previewEl.innerText = `👤 ${match.data.name} (Member ID: ${match.data.id || 'N/A'})`;
-            previewEl.classList.remove("error");
-          } else {
-            previewEl.innerText = "⚠️ Member not found with this National ID";
-            previewEl.classList.add("error");
-          }
-        } catch (err) {
-          console.error("Lookup error:", err);
-        }
-      });
-    }
-
-    setupMemberLookup("savingsMemberId", "savingsMemberNamePreview");
-    setupMemberLookup("loanMemberId", "loanMemberNamePreview");
-
-    // Tab Navigation Logic
-    window.switchTab = function(tabId, event) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-      const targetTabBtn = document.querySelector(`.tab-btn[onclick*="${tabId}"]`);
-      if (targetTabBtn) {
-        targetTabBtn.classList.add('active');
-      }
-
-      document.getElementById(tabId).classList.add('active');
-
-      if (tabId === 'allMembersTab') {
-        fetchAllMembers();
-      }
-    };
-
-    // Helper: Save transaction record to Firebase
-    async function processTransaction(nationalId, desc, amount, date) {
-      if (!isWithinSavingsPeriod(date)) {
-        alert("Transaction date must be between 01-09-2026 and 30-12-2026!");
-        return null;
-      }
-
-      const match = await findMemberByNationalIdOnly(nationalId);
+      const match = await findMember(nationalId);
       if (!match) {
-        alert("Member not found! Please verify the National ID Number or register the member under 'All Members'.");
-        return null;
-      }
-
-      const key = match.key;
-      let memberData = match.data;
-      const memberRef = ref(db, `members/${key}`);
-
-      if (memberData.status === "Inactive") {
-        alert(`Cannot post transaction! Member ${memberData.name} is currently DEACTIVATED.`);
-        return null;
-      }
-
-      if (!memberData.transactions) memberData.transactions = [];
-
-      let debit = "-";
-      let credit = "-";
-
-      if (desc === "Savings Deposit" || desc === "Registration Fee") {
-        credit = amount;
-        memberData.savingsTotal = (memberData.savingsTotal || 0) + amount;
-      } else if (desc === "Loan Issued") {
-        debit = amount;
-        memberData.loanBalance = (memberData.loanBalance || 0) + amount;
-      } else if (desc === "Loan Repayment") {
-        credit = amount;
-        memberData.loanBalance = Math.max(0, (memberData.loanBalance || 0) - amount);
-      }
-
-      const newTx = {
-        date: date,
-        desc: desc,
-        debit: debit,
-        credit: credit,
-        balance: desc.includes("Loan") ? memberData.loanBalance : memberData.savingsTotal
-      };
-
-      memberData.transactions.push(newTx);
-      await set(memberRef, memberData);
-      return memberData;
-    }
-
-    // Modal Submit: Add Member
-    document.getElementById("addMemberForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!currentUser) return;
-
-      const nationalId = document.getElementById("newNationalId").value.trim();
-      const id = document.getElementById("newMemberId").value.trim();
-      const name = document.getElementById("newMemberName").value.trim().toUpperCase();
-      const phone = document.getElementById("newMemberPhone").value.trim();
-      const regFee = parseFloat(document.getElementById("regFee").value) || 0;
-      const date = document.getElementById("addMemberDate").value;
-
-      if (!isWithinSavingsPeriod(date)) {
-        alert("Registration date must be between 01-09-2026 and 30-12-2026!");
+        alert("Member not found with this National ID!");
         return;
       }
 
-      try {
-        const dbKey = nationalId;
-        const memberRef = ref(db, `members/${dbKey}`);
-        const snapshot = await get(memberRef);
-
-        if (snapshot.exists()) {
-          alert(`Member with National ID ${nationalId} already exists!`);
-          return;
-        }
-
-        let newMemberData = {
-          nationalId: nationalId,
-          id: id,
-          name: name,
-          phone: phone,
-          status: "Active",
-          savingsTotal: 0,
-          loanBalance: 0,
-          transactions: []
-        };
-
-        if (regFee > 0) {
-          newMemberData.savingsTotal = regFee;
-          newMemberData.transactions.push({
-            date: date,
-            desc: "Registration Fee",
-            debit: "-",
-            credit: regFee,
-            balance: regFee
-          });
-        }
-
-        await set(memberRef, newMemberData);
-        alert(`Successfully registered Member: ${name}\nNational ID: ${nationalId}\nAssigned Member ID: ${id}`);
-        renderMemberData(newMemberData);
-        document.getElementById("addMemberForm").reset();
-        document.getElementById("addMemberDate").value = defaultSavingsStartDate;
-        closeAddMemberModal();
-        fetchAllMembers();
-      } catch (err) {
-        console.error(err);
-        alert("Failed to register member.");
+      const activePassword = String(match.data.password || "0000").trim();
+      if (activePassword !== password) {
+        alert("Incorrect PIN!");
+        return;
       }
+
+      currentLoggedInMemberKey = match.key;
+      currentLoggedInMemberData = match.data;
+
+      document.getElementById("memberLoginSection").style.display = "none";
+      document.getElementById("portalContent").style.display = "block";
+      document.getElementById("memberLogoutBtn").style.display = "inline-block";
+
+      renderMemberData(match.data);
+      checkWithdrawalWindow();
     });
 
-    // Tab 1 Submit: Savings
-    document.getElementById("savingsForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!currentUser) return;
-
-      const nationalId = document.getElementById("savingsMemberId").value.trim();
-      const amount = parseFloat(document.getElementById("savingsAmount").value);
-      const date = document.getElementById("savingsDate").value;
-
-      try {
-        const updatedMember = await processTransaction(nationalId, "Savings Deposit", amount, date);
-        if (updatedMember) {
-          alert(`Successfully saved KES ${amount} deposit for ${updatedMember.name}!`);
-          renderMemberData(updatedMember);
-          document.getElementById("savingsForm").reset();
-          document.getElementById("savingsMemberNamePreview").innerText = "";
-          document.getElementById("savingsDate").value = defaultSavingsStartDate;
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Failed to record savings.");
-      }
-    });
-
-    // Tab 2 Submit: Loans
-    document.getElementById("loanForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!currentUser) return;
-
-      const nationalId = document.getElementById("loanMemberId").value.trim();
-      const type = document.getElementById("loanType").value;
-      const amount = parseFloat(document.getElementById("loanAmount").value);
-      const date = document.getElementById("loanDate").value;
-
-      try {
-        const updatedMember = await processTransaction(nationalId, type, amount, date);
-        if (updatedMember) {
-          alert(`Successfully recorded ${type} of KES ${amount} for ${updatedMember.name}!`);
-          renderMemberData(updatedMember);
-          document.getElementById("loanForm").reset();
-          document.getElementById("loanMemberNamePreview").innerText = "";
-          document.getElementById("loanDate").value = defaultSavingsStartDate;
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Failed to record loan transaction.");
-      }
-    });
-
-    // Fetch and display all members in Admin Panel
-    async function fetchAllMembers() {
-      const tbody = document.getElementById("allMembersTableBody");
-      tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Loading members list...</td></tr>`;
-
-      try {
-        const dbRef = ref(db);
-        const snapshot = await get(child(dbRef, `members`));
-
-        if (snapshot.exists()) {
-          const membersObj = snapshot.val();
-          const keys = Object.keys(membersObj);
-
-          if (keys.length > 0) {
-            let totalSavings = 0;
-            let totalLoans = 0;
-
-            keys.forEach(k => {
-              const m = membersObj[k];
-              totalSavings += (m.savingsTotal || 0);
-              totalLoans += (m.loanBalance || 0);
-            });
-
-            document.getElementById("adminTotalMembersCount").innerText = keys.length;
-            document.getElementById("adminTotalSavingsSum").innerText = `KES ${totalSavings.toLocaleString()}`;
-            document.getElementById("adminTotalLoansSum").innerText = `KES ${totalLoans.toLocaleString()}`;
-
-            tbody.innerHTML = keys.map(k => {
-              const m = membersObj[k];
-              const statusStr = m.status || 'Active';
-              const isInactive = statusStr === 'Inactive';
-              return `
-              <tr>
-                <td><strong>${m.id || 'Not Assigned'}</strong></td>
-                <td>${m.nationalId || k}</td>
-                <td>${m.name || 'N/A'}</td>
-                <td>${m.phone || 'N/A'}</td>
-                <td class="text-right">KES ${(m.savingsTotal || 0).toLocaleString()}</td>
-                <td class="text-right">KES ${(m.loanBalance || 0).toLocaleString()}</td>
-                <td><span class="badge ${isInactive ? 'badge-inactive' : 'badge-active'}">${statusStr}</span></td>
-                <td>
-                  <button class="btn-action btn-edit" onclick="openEditModal('${k}', '${m.id || ''}', '${m.nationalId || k}', '${m.name || ''}', '${m.phone || ''}')">Edit</button>
-                  <button class="btn-action btn-toggle" onclick="toggleStatus('${k}', '${statusStr}')">${isInactive ? 'Activate' : 'Deactivate'}</button>
-                </td>
-              </tr>
-            `;}).join('');
-            return;
-          }
-        }
-        
-        document.getElementById("adminTotalMembersCount").innerText = "0";
-        document.getElementById("adminTotalSavingsSum").innerText = "KES 0.00";
-        document.getElementById("adminTotalLoansSum").innerText = "KES 0.00";
-        tbody.innerHTML = `<tr><td colspan="8" class="empty-state">No members found in database.</td></tr>`;
-      } catch (err) {
-        console.error("Error fetching all members:", err);
-        tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Failed to load members list.</td></tr>`;
-      }
-    }
-
-    // Toggle Member Active/Inactive Status
-    window.toggleStatus = async function(key, currentStatus) {
-      if (!currentUser) return;
-      const newStatus = currentStatus === "Inactive" ? "Active" : "Inactive";
-      if (!confirm(`Are you sure you want to set status to ${newStatus}?`)) return;
-
-      try {
-        await update(ref(db, `members/${key}`), { status: newStatus });
-        alert(`Member status updated to ${newStatus}`);
-        fetchAllMembers();
-      } catch (err) {
-        console.error(err);
-        alert("Failed to update status.");
-      }
+    window.memberLogout = function() {
+      currentLoggedInMemberKey = null;
+      currentLoggedInMemberData = null;
+      document.getElementById("portalContent").style.display = "none";
+      document.getElementById("memberLoginSection").style.display = "block";
+      document.getElementById("memberLogoutBtn").style.display = "none";
+      document.getElementById("memberLoginForm").reset();
     };
 
-    // Modal Edit Logic
-    window.openEditModal = function(key, memberId, nationalId, name, phone) {
-      if (!currentUser) return;
-      document.getElementById("editDbKey").value = key;
-      document.getElementById("editMemberId").value = memberId;
-      document.getElementById("editNationalId").value = nationalId;
-      document.getElementById("editMemberName").value = name;
-      document.getElementById("editMemberPhone").value = phone;
-      document.getElementById("editModal").style.display = "flex";
-    };
-
-    window.closeEditModal = function() {
-      document.getElementById("editModal").style.display = "none";
-    };
-
-    document.getElementById("editMemberForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!currentUser) return;
-
-      const key = document.getElementById("editDbKey").value;
-      const newMemberId = document.getElementById("editMemberId").value.trim();
-      const newNationalId = document.getElementById("editNationalId").value.trim();
-      const newName = document.getElementById("editMemberName").value.trim().toUpperCase();
-      const newPhone = document.getElementById("editMemberPhone").value.trim();
-
-      try {
-        await update(ref(db, `members/${key}`), {
-          id: newMemberId,
-          nationalId: newNationalId,
-          name: newName,
-          phone: newPhone
-        });
-        alert(`Updated details successfully!`);
-        closeEditModal();
-        fetchAllMembers();
-      } catch (err) {
-        console.error(err);
-        alert("Failed to update member details.");
-      }
-    });
-
-    // Member Search (STRICTLY via National ID No Only)
-    async function searchMember() {
-      const nationalIdQuery = document.getElementById("memberSearchInput").value.trim();
-      if (!nationalIdQuery) return;
-
-      try {
-        const match = await findMemberByNationalIdOnly(nationalIdQuery);
-        if (match) {
-          renderMemberData(match.data);
-        } else {
-          renderMemberData(null);
-        }
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      }
-    }
-
+    // Render Member Dashboard
     function renderMemberData(member) {
-      const tbody = document.getElementById("transactionTableBody");
-      
-      if (!member) {
-        document.getElementById("memberNameDisplay").innerText = "Not Found";
-        document.getElementById("memberIdDisplay").innerText = "N/A";
-        document.getElementById("totalSavingsDisplay").innerText = "KES 0.00";
-        document.getElementById("loanBalanceDisplay").innerText = "KES 0.00";
-        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No records found matching entered National ID.</td></tr>`;
-        return;
-      }
-
-      document.getElementById("memberNameDisplay").innerText = `${member.name} (${member.phone || 'No Phone'})`;
-      document.getElementById("memberIdDisplay").innerText = `ID: ${member.nationalId || 'N/A'} / Member No: ${member.id || 'N/A'}`;
+      document.getElementById("memberNameDisplay").innerText = member.name;
+      document.getElementById("memberIdDisplay").innerText = member.nationalId;
       document.getElementById("totalSavingsDisplay").innerText = `KES ${(member.savingsTotal || 0).toLocaleString()}`;
       document.getElementById("loanBalanceDisplay").innerText = `KES ${(member.loanBalance || 0).toLocaleString()}`;
 
+      const target = member.monthlyTarget || 0;
+      const weekly = target / 4;
+      document.getElementById("savingTargetDisplay").innerText = `KES ${target.toLocaleString()}`;
+      document.getElementById("weeklyTargetDisplay").innerText = `Weekly Goal: KES ${weekly.toLocaleString()} / week`;
+
+      const tbody = document.getElementById("transactionTableBody");
       if (member.transactions && member.transactions.length > 0) {
         tbody.innerHTML = member.transactions.map(t => `
           <tr>
@@ -1236,14 +582,281 @@
           </tr>
         `).join('');
       } else {
-        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No transactions recorded yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No transaction records.</td></tr>`;
       }
     }
 
-    document.getElementById("searchBtn").addEventListener("click", searchMember);
-    document.getElementById("memberSearchInput").addEventListener("keypress", (e) => {
-      if (e.key === "Enter") searchMember();
+    // Modal Controls: Change PIN in Portal
+    window.openChangePinModal = () => document.getElementById("changePinModal").style.display = "flex";
+    window.closeChangePinModal = () => document.getElementById("changePinModal").style.display = "none";
+
+    document.getElementById("changePinForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const currentPinInput = document.getElementById("currentPin").value.trim();
+      const newPinInput = document.getElementById("newPin").value.trim();
+
+      if (!currentLoggedInMemberKey) {
+        alert("Session expired. Please log in again.");
+        window.memberLogout();
+        return;
+      }
+
+      const storedPin = String(currentLoggedInMemberData ? (currentLoggedInMemberData.password || "0000") : "0000").trim();
+      if (currentPinInput !== storedPin) {
+        alert("Current PIN is incorrect!");
+        return;
+      }
+
+      try {
+        await update(ref(db, `members/${currentLoggedInMemberKey}`), { password: newPinInput });
+        if (currentLoggedInMemberData) {
+          currentLoggedInMemberData.password = newPinInput;
+        }
+        alert("PIN successfully changed!");
+        window.closeChangePinModal();
+        document.getElementById("changePinForm").reset();
+      } catch (err) {
+        alert("Failed to update PIN: " + err.message);
+      }
     });
+
+    // Withdrawal Modal Actions
+    window.openWithdrawModal = () => document.getElementById("withdrawModal").style.display = "flex";
+    window.closeWithdrawModal = () => document.getElementById("withdrawModal").style.display = "none";
+
+    document.getElementById("withdrawForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const amount = parseFloat(document.getElementById("withdrawAmount").value);
+
+      if (amount > (currentLoggedInMemberData.savingsTotal || 0)) {
+        alert("Requested amount exceeds current savings balance!");
+        return;
+      }
+
+      const withdrawRef = ref(db, `withdrawals/${Date.now()}`);
+      await set(withdrawRef, {
+        memberKey: currentLoggedInMemberKey,
+        nationalId: currentLoggedInMemberData.nationalId,
+        name: currentLoggedInMemberData.name,
+        amount: amount,
+        date: new Date().toISOString().split('T')[0],
+        status: "Pending"
+      });
+
+      alert("Withdrawal request submitted successfully! Pending Admin approval.");
+      closeWithdrawModal();
+    });
+
+    // Savings Target Modal
+    window.openTargetModal = () => document.getElementById("targetModal").style.display = "flex";
+    window.closeTargetModal = () => document.getElementById("targetModal").style.display = "none";
+
+    document.getElementById("targetForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const targetAmount = parseFloat(document.getElementById("targetAmountInput").value);
+
+      await update(ref(db, `members/${currentLoggedInMemberKey}`), { monthlyTarget: targetAmount });
+      currentLoggedInMemberData.monthlyTarget = targetAmount;
+      renderMemberData(currentLoggedInMemberData);
+      alert("Monthly saving target updated!");
+      closeTargetModal();
+    });
+
+    // Admin Auth Logic
+    const authBtn = document.getElementById("authToggleBtn");
+    authBtn.addEventListener("click", () => {
+      if (!isAdminLoggedIn) {
+        const pass = prompt("Enter Admin Passkey:");
+        if (pass === ADMIN_PASSKEY) {
+          isAdminLoggedIn = true;
+          document.getElementById("adminPanel").style.display = "block";
+          authBtn.innerText = "Admin Logout";
+          fetchPendingWithdrawals();
+          fetchAllMembers();
+        } else if (pass !== null) alert("Incorrect Passkey!");
+      } else {
+        isAdminLoggedIn = false;
+        document.getElementById("adminPanel").style.display = "none";
+        authBtn.innerText = "Admin Login";
+      }
+    });
+
+    // Fetch Pending Withdrawals
+    async function fetchPendingWithdrawals() {
+      const snapshot = await get(child(ref(db), "withdrawals"));
+      const tbody = document.getElementById("adminWithdrawalsTableBody");
+
+      if (!snapshot.exists()) {
+        tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No pending requests.</td></tr>`;
+        return;
+      }
+
+      const data = snapshot.val();
+      const rows = [];
+      for (const wId in data) {
+        const w = data[wId];
+        if (w.status === "Pending") {
+          rows.push(`
+            <tr>
+              <td>${w.date}</td>
+              <td>${w.name}</td>
+              <td>${w.nationalId}</td>
+              <td class="text-right">KES ${w.amount.toLocaleString()}</td>
+              <td><span class="badge badge-pending">Pending</span></td>
+              <td>
+                <button onclick="approveWithdrawal('${wId}', '${w.memberKey}', ${w.amount})" style="background:var(--success-color); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Approve</button>
+                <button onclick="rejectWithdrawal('${wId}')" class="btn-danger" style="border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Reject</button>
+              </td>
+            </tr>
+          `);
+        }
+      }
+      tbody.innerHTML = rows.length > 0 ? rows.join('') : `<tr><td colspan="6" class="empty-state">No pending requests.</td></tr>`;
+    }
+
+    // Fetch All Members Directory
+    async function fetchAllMembers() {
+      const snapshot = await get(child(ref(db), "members"));
+      const tbody = document.getElementById("allMembersTableBody");
+
+      if (!snapshot.exists()) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No registered members found.</td></tr>`;
+        return;
+      }
+
+      const members = snapshot.val();
+      const rows = [];
+      for (const key in members) {
+        const m = members[key];
+        rows.push(`
+          <tr>
+            <td>${m.nationalId || '-'}</td>
+            <td>${m.name}</td>
+            <td>${m.phone || '-'}</td>
+            <td class="text-right">KES ${(m.monthlyTarget || 0).toLocaleString()}</td>
+            <td class="text-right">KES ${(m.savingsTotal || 0).toLocaleString()}</td>
+            <td class="text-right">KES ${(m.loanBalance || 0).toLocaleString()}</td>
+            <td>
+              <div class="btn-action-group">
+                <button onclick="openAdminEditMemberModal('${key}')" style="padding:4px 8px; font-size:0.8rem; cursor:pointer;">Edit</button>
+                <button onclick="adminResetMemberPin('${key}', '${m.name}')" class="btn-danger" style="padding:4px 8px; font-size:0.8rem; cursor:pointer; border:none; border-radius:4px;">Reset PIN</button>
+              </div>
+            </td>
+          </tr>
+        `);
+      }
+      tbody.innerHTML = rows.join('');
+    }
+
+    // Admin Reset Member PIN to Default (0000)
+    window.adminResetMemberPin = async function(key, memberName) {
+      if (confirm(`Are you sure you want to reset PIN for ${memberName} to default '0000'?`)) {
+        await update(ref(db, `members/${key}`), { password: "0000" });
+        alert(`PIN for ${memberName} has been reset to '0000'.`);
+      }
+    };
+
+    // Admin Edit Member Details Modal Controls
+    window.openAdminEditMemberModal = async function(key) {
+      const snapshot = await get(child(ref(db), `members/${key}`));
+      if (!snapshot.exists()) return;
+
+      const m = snapshot.val();
+      document.getElementById("adminEditMemberKey").value = key;
+      document.getElementById("adminEditMemberName").value = m.name || '';
+      document.getElementById("adminEditNationalId").value = m.nationalId || '';
+      document.getElementById("adminEditMemberPhone").value = m.phone || '';
+      document.getElementById("adminEditMemberTarget").value = m.monthlyTarget || 0;
+      document.getElementById("adminEditMemberModal").style.display = "flex";
+    };
+
+    window.closeAdminEditMemberModal = () => document.getElementById("adminEditMemberModal").style.display = "none";
+
+    document.getElementById("adminEditMemberForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const key = document.getElementById("adminEditMemberKey").value;
+      const name = document.getElementById("adminEditMemberName").value.trim().toUpperCase();
+      const nationalId = document.getElementById("adminEditNationalId").value.trim();
+      const phone = document.getElementById("adminEditMemberPhone").value.trim();
+      const targetVal = parseFloat(document.getElementById("adminEditMemberTarget").value) || 0;
+
+      await update(ref(db, `members/${key}`), {
+        name: name,
+        nationalId: nationalId,
+        phone: phone,
+        monthlyTarget: targetVal
+      });
+
+      alert("Member details updated successfully!");
+      window.closeAdminEditMemberModal();
+      fetchAllMembers();
+    });
+
+    window.approveWithdrawal = async function(wId, memberKey, amount) {
+      const memberRef = ref(db, `members/${memberKey}`);
+      const memberSnap = await get(memberRef);
+
+      if (memberSnap.exists()) {
+        const m = memberSnap.val();
+        m.savingsTotal = (m.savingsTotal || 0) - amount;
+        if (!m.transactions) m.transactions = [];
+
+        m.transactions.push({
+          date: new Date().toISOString().split('T')[0],
+          desc: "Savings Withdrawal",
+          debit: amount,
+          credit: "-",
+          balance: m.savingsTotal
+        });
+
+        await set(memberRef, m);
+        await update(ref(db, `withdrawals/${wId}`), { status: "Approved" });
+        alert("Withdrawal approved!");
+        fetchPendingWithdrawals();
+      }
+    };
+
+    window.rejectWithdrawal = async function(wId) {
+      await update(ref(db, `withdrawals/${wId}`), { status: "Rejected" });
+      alert("Withdrawal request rejected.");
+      fetchPendingWithdrawals();
+    };
+
+    // Admin Add Member Modal Controls
+    window.openAddMemberModal = () => document.getElementById("addMemberModal").style.display = "flex";
+    window.closeAddMemberModal = () => document.getElementById("addMemberModal").style.display = "none";
+
+    document.getElementById("addMemberForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nationalId = document.getElementById("newNationalId").value.trim();
+      const name = document.getElementById("newMemberName").value.trim().toUpperCase();
+      const phone = document.getElementById("newMemberPhone").value.trim();
+      const target = parseFloat(document.getElementById("newMemberTarget").value) || 0;
+
+      const dbKey = name.replace(/\s+/g, '_').toLowerCase();
+      await set(ref(db, `members/${dbKey}`), {
+        nationalId: nationalId,
+        name: name,
+        phone: phone,
+        password: "0000",
+        monthlyTarget: target,
+        savingsTotal: 0,
+        loanBalance: 0,
+        status: "Active"
+      });
+
+      alert(`Member ${name} registered successfully with default PIN '0000'!`);
+      closeAddMemberModal();
+      fetchAllMembers();
+    });
+
+    window.switchTab = function(tabId, e) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      e.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+      if (tabId === 'allMembersTab') fetchAllMembers();
+    };
   </script>
 </body>
 </html>
