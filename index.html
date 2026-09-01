@@ -15,6 +15,7 @@
       --border-color: #e0e0e0;
       --danger-color: #c0392b;
       --success-color: #27ae60;
+      --mpesa-color: #25a244;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -70,7 +71,7 @@
       gap: 10px;
     }
     .paybill-title { font-weight: bold; color: #1b5e20; font-size: 0.95rem; }
-    .paybill-details { display: flex; gap: 15px; flex-wrap: wrap; }
+    .paybill-details { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; }
     .paybill-pill {
       background: #ffffff;
       padding: 6px 14px;
@@ -78,6 +79,18 @@
       font-size: 0.9rem;
       border: 1px solid #c8e6c9;
     }
+    .btn-stk {
+      background-color: var(--mpesa-color);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    }
+    .btn-stk:hover { background-color: #1e8535; }
 
     /* Admin Card & Tabs */
     .admin-card {
@@ -187,8 +200,8 @@
       <div id="savingsTab" class="tab-content active">
         <form id="savingsForm" class="admin-grid">
           <div class="form-group">
-            <label>Member National ID</label>
-            <input type="text" id="savingsMemberId" placeholder="Type National ID..." required>
+            <label>National ID Number</label>
+            <input type="text" id="savingsNationalId" placeholder="Enter National ID..." required>
           </div>
           <div class="form-group">
             <label>Savings Deposit Amount (KES)</label>
@@ -206,8 +219,8 @@
       <div id="loanTab" class="tab-content">
         <form id="loanForm" class="admin-grid">
           <div class="form-group">
-            <label>Member National ID</label>
-            <input type="text" id="loanMemberId" placeholder="Type National ID..." required>
+            <label>National ID Number</label>
+            <input type="text" id="loanNationalId" placeholder="Enter National ID..." required>
           </div>
           <div class="form-group">
             <label>Transaction Type</label>
@@ -276,10 +289,11 @@
     <!-- MEMBER PORTAL DASHBOARD -->
     <div id="portalContent" style="display: none;">
       <div class="paybill-card">
-        <div class="paybill-title">📲 Payment Details via M-PESA</div>
+        <div class="paybill-title">📲 Payment Options via M-PESA</div>
         <div class="paybill-details">
           <div class="paybill-pill">Paybill No: <strong>400200</strong></div>
           <div class="paybill-pill">Account No: <strong>40056034</strong></div>
+          <button class="btn-stk" onclick="openStkPushModal()">+ Add Savings (STK Push)</button>
         </div>
       </div>
 
@@ -301,8 +315,8 @@
           </div>
         </div>
         <div class="stat-card">
-          <h3>National ID</h3>
-          <p id="memberIdDisplay">--</p>
+          <h3>National ID Number</h3>
+          <p id="nationalIdDisplay">--</p>
         </div>
         <div class="stat-card accent">
           <h3>Total Savings</h3>
@@ -343,6 +357,31 @@
     </div>
   </div>
 
+  <!-- MODAL: STK PUSH DEPOSIT -->
+  <div id="stkPushModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="color:var(--mpesa-color);">📲 Deposit via M-PESA STK Push</h3>
+        <button class="close-btn" onclick="closeStkPushModal()">&times;</button>
+      </div>
+      <form id="stkPushForm" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="form-group">
+          <label>National ID Number</label>
+          <input type="text" id="stkNationalId" required>
+        </div>
+        <div class="form-group">
+          <label>Phone Number (M-PESA)</label>
+          <input type="tel" id="stkPhone" placeholder="e.g. 0712345678" required>
+        </div>
+        <div class="form-group">
+          <label>Deposit Amount (KES)</label>
+          <input type="number" id="stkAmount" min="1" placeholder="Enter amount..." required>
+        </div>
+        <button type="submit" class="btn-submit" style="background-color: var(--mpesa-color);">Send M-PESA Prompt</button>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL: WITHDRAWAL REQUEST -->
   <div id="withdrawModal" class="modal">
     <div class="modal-content">
@@ -377,7 +416,7 @@
     </div>
   </div>
 
-  <!-- MODAL: CHANGE PIN (IN PORTAL) -->
+  <!-- MODAL: CHANGE PIN -->
   <div id="changePinModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -408,7 +447,7 @@
       <form id="addMemberForm" style="display:flex; flex-direction:column; gap:12px;">
         <div class="form-group">
           <label>National ID Number</label>
-          <input type="text" id="newNationalId" required>
+          <input type="text" id="newNationalId" placeholder="e.g. 12345678" required>
         </div>
         <div class="form-group">
           <label>Member Full Name</label>
@@ -438,12 +477,12 @@
       <form id="adminEditMemberForm" style="display:flex; flex-direction:column; gap:12px;">
         <input type="hidden" id="adminEditMemberKey">
         <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="adminEditMemberName" required>
-        </div>
-        <div class="form-group">
           <label>National ID Number</label>
           <input type="text" id="adminEditNationalId" required>
+        </div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="adminEditMemberName" required>
         </div>
         <div class="form-group">
           <label>Phone Number</label>
@@ -481,7 +520,6 @@
     let currentLoggedInMemberKey = null;
     let currentLoggedInMemberData = null;
 
-    // Check 28th - 29th Withdrawal Window Activation
     function checkWithdrawalWindow() {
       const today = new Date();
       const day = today.getDate();
@@ -499,36 +537,33 @@
       }
     }
 
-    // Helper: Find member by field match
-    async function findMember(queryInput) {
+    // Lookup exclusively by National ID
+    async function findMemberByNationalId(nationalIdInput) {
       const dbRef = ref(db);
       const snapshot = await get(child(dbRef, `members`));
       if (!snapshot.exists()) return null;
 
       const membersObj = snapshot.val();
-      const query = queryInput.trim().toLowerCase();
+      const query = nationalIdInput.trim().toLowerCase();
 
       for (const key in membersObj) {
         const m = membersObj[key];
-        if (
-          key.toLowerCase() === query ||
-          (m.nationalId && String(m.nationalId).trim().toLowerCase() === query)
-        ) {
+        if (m.nationalId && String(m.nationalId).trim().toLowerCase() === query) {
           return { key: key, data: m };
         }
       }
       return null;
     }
 
-    // Member Login Logic
+    // Member Login
     document.getElementById("memberLoginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const nationalId = document.getElementById("loginNationalId").value.trim();
       const password = document.getElementById("loginPassword").value.trim();
 
-      const match = await findMember(nationalId);
+      const match = await findMemberByNationalId(nationalId);
       if (!match) {
-        alert("Member not found with this National ID!");
+        alert("No account found with National ID: " + nationalId);
         return;
       }
 
@@ -558,10 +593,9 @@
       document.getElementById("memberLoginForm").reset();
     };
 
-    // Render Member Dashboard
     function renderMemberData(member) {
       document.getElementById("memberNameDisplay").innerText = member.name;
-      document.getElementById("memberIdDisplay").innerText = member.nationalId;
+      document.getElementById("nationalIdDisplay").innerText = member.nationalId || 'N/A';
       document.getElementById("totalSavingsDisplay").innerText = `KES ${(member.savingsTotal || 0).toLocaleString()}`;
       document.getElementById("loanBalanceDisplay").innerText = `KES ${(member.loanBalance || 0).toLocaleString()}`;
 
@@ -586,7 +620,106 @@
       }
     }
 
-    // Modal Controls: Change PIN in Portal
+    // Modal STK Push
+    window.openStkPushModal = () => {
+      if (currentLoggedInMemberData) {
+        document.getElementById("stkNationalId").value = currentLoggedInMemberData.nationalId || '';
+        document.getElementById("stkPhone").value = currentLoggedInMemberData.phone || '';
+      }
+      document.getElementById("stkPushModal").style.display = "flex";
+    };
+    window.closeStkPushModal = () => document.getElementById("stkPushModal").style.display = "none";
+
+    document.getElementById("stkPushForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nationalId = document.getElementById("stkNationalId").value.trim();
+      const phone = document.getElementById("stkPhone").value.trim();
+      const amount = parseFloat(document.getElementById("stkAmount").value);
+
+      const match = await findMemberByNationalId(nationalId);
+      if (!match) {
+        alert("Member with National ID " + nationalId + " not found!");
+        return;
+      }
+
+      alert(`STK Push Request Sent!\n\nPlease check phone ${phone} to complete payment of KES ${amount.toLocaleString()}.`);
+      closeStkPushModal();
+      document.getElementById("stkPushForm").reset();
+    });
+
+    // Admin Savings Deposit
+    document.getElementById("savingsForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nationalId = document.getElementById("savingsNationalId").value.trim();
+      const amount = parseFloat(document.getElementById("savingsAmount").value);
+      const date = document.getElementById("savingsDate").value;
+
+      const match = await findMemberByNationalId(nationalId);
+      if (!match) {
+        alert("Member with National ID " + nationalId + " not found!");
+        return;
+      }
+
+      const m = match.data;
+      m.savingsTotal = (m.savingsTotal || 0) + amount;
+      if (!m.transactions) m.transactions = [];
+
+      m.transactions.push({
+        date: date,
+        desc: "Savings Deposit",
+        debit: "-",
+        credit: amount,
+        balance: m.savingsTotal
+      });
+
+      await set(ref(db, `members/${match.key}`), m);
+      alert(`Successfully recorded deposit of KES ${amount.toLocaleString()} for National ID ${m.nationalId}`);
+      document.getElementById("savingsForm").reset();
+    });
+
+    // Admin Loan Form
+    document.getElementById("loanForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nationalId = document.getElementById("loanNationalId").value.trim();
+      const type = document.getElementById("loanType").value;
+      const amount = parseFloat(document.getElementById("loanAmount").value);
+      const date = document.getElementById("loanDate").value;
+
+      const match = await findMemberByNationalId(nationalId);
+      if (!match) {
+        alert("Member with National ID " + nationalId + " not found!");
+        return;
+      }
+
+      const m = match.data;
+      if (!m.transactions) m.transactions = [];
+
+      if (type === "Loan Issued") {
+        m.loanBalance = (m.loanBalance || 0) + amount;
+        m.transactions.push({
+          date: date,
+          desc: "Loan Issued",
+          debit: amount,
+          credit: "-",
+          balance: m.savingsTotal || 0
+        });
+      } else {
+        m.loanBalance = Math.max(0, (m.loanBalance || 0) - amount);
+        m.transactions.push({
+          date: date,
+          desc: "Loan Repayment",
+          debit: "-",
+          credit: amount,
+          balance: m.savingsTotal || 0
+        });
+      }
+
+      await set(ref(db, `members/${match.key}`), m);
+      alert(`Loan record updated for National ID ${m.nationalId}`);
+      document.getElementById("loanForm").reset();
+    });
+
+    // Change PIN Controls
     window.openChangePinModal = () => document.getElementById("changePinModal").style.display = "flex";
     window.closeChangePinModal = () => document.getElementById("changePinModal").style.display = "none";
 
@@ -620,7 +753,7 @@
       }
     });
 
-    // Withdrawal Modal Actions
+    // Withdrawal Modal
     window.openWithdrawModal = () => document.getElementById("withdrawModal").style.display = "flex";
     window.closeWithdrawModal = () => document.getElementById("withdrawModal").style.display = "none";
 
@@ -636,7 +769,7 @@
       const withdrawRef = ref(db, `withdrawals/${Date.now()}`);
       await set(withdrawRef, {
         memberKey: currentLoggedInMemberKey,
-        nationalId: currentLoggedInMemberData.nationalId,
+        nationalId: currentLoggedInMemberData.nationalId || 'N/A',
         name: currentLoggedInMemberData.name,
         amount: amount,
         date: new Date().toISOString().split('T')[0],
@@ -647,7 +780,7 @@
       closeWithdrawModal();
     });
 
-    // Savings Target Modal
+    // Target Modal
     window.openTargetModal = () => document.getElementById("targetModal").style.display = "flex";
     window.closeTargetModal = () => document.getElementById("targetModal").style.display = "none";
 
@@ -662,7 +795,7 @@
       closeTargetModal();
     });
 
-    // Admin Auth Logic
+    // Admin Auth
     const authBtn = document.getElementById("authToggleBtn");
     authBtn.addEventListener("click", () => {
       if (!isAdminLoggedIn) {
@@ -681,7 +814,7 @@
       }
     });
 
-    // Fetch Pending Withdrawals
+    // Pending Withdrawals List
     async function fetchPendingWithdrawals() {
       const snapshot = await get(child(ref(db), "withdrawals"));
       const tbody = document.getElementById("adminWithdrawalsTableBody");
@@ -700,7 +833,7 @@
             <tr>
               <td>${w.date}</td>
               <td>${w.name}</td>
-              <td>${w.nationalId}</td>
+              <td>${w.nationalId || '-'}</td>
               <td class="text-right">KES ${w.amount.toLocaleString()}</td>
               <td><span class="badge badge-pending">Pending</span></td>
               <td>
@@ -714,7 +847,7 @@
       tbody.innerHTML = rows.length > 0 ? rows.join('') : `<tr><td colspan="6" class="empty-state">No pending requests.</td></tr>`;
     }
 
-    // Fetch All Members Directory
+    // All Members Directory
     async function fetchAllMembers() {
       const snapshot = await get(child(ref(db), "members"));
       const tbody = document.getElementById("allMembersTableBody");
@@ -724,31 +857,34 @@
         return;
       }
 
-      const members = snapshot.val();
-      const rows = [];
-      for (const key in members) {
-        const m = members[key];
-        rows.push(`
-          <tr>
-            <td>${m.nationalId || '-'}</td>
-            <td>${m.name}</td>
-            <td>${m.phone || '-'}</td>
-            <td class="text-right">KES ${(m.monthlyTarget || 0).toLocaleString()}</td>
-            <td class="text-right">KES ${(m.savingsTotal || 0).toLocaleString()}</td>
-            <td class="text-right">KES ${(m.loanBalance || 0).toLocaleString()}</td>
-            <td>
-              <div class="btn-action-group">
-                <button onclick="openAdminEditMemberModal('${key}')" style="padding:4px 8px; font-size:0.8rem; cursor:pointer;">Edit</button>
-                <button onclick="adminResetMemberPin('${key}', '${m.name}')" class="btn-danger" style="padding:4px 8px; font-size:0.8rem; cursor:pointer; border:none; border-radius:4px;">Reset PIN</button>
-              </div>
-            </td>
-          </tr>
-        `);
-      }
+      const membersObj = snapshot.val();
+      const memberList = Object.keys(membersObj).map(key => ({
+        key,
+        ...membersObj[key]
+      }));
+
+      memberList.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+      const rows = memberList.map(m => `
+        <tr>
+          <td><strong>${m.nationalId || '-'}</strong></td>
+          <td>${m.name}</td>
+          <td>${m.phone || '-'}</td>
+          <td class="text-right">KES ${(m.monthlyTarget || 0).toLocaleString()}</td>
+          <td class="text-right">KES ${(m.savingsTotal || 0).toLocaleString()}</td>
+          <td class="text-right">KES ${(m.loanBalance || 0).toLocaleString()}</td>
+          <td>
+            <div class="btn-action-group">
+              <button onclick="openAdminEditMemberModal('${m.key}')" style="padding:4px 8px; font-size:0.8rem; cursor:pointer;">Edit</button>
+              <button onclick="adminResetMemberPin('${m.key}', '${m.name}')" class="btn-danger" style="padding:4px 8px; font-size:0.8rem; cursor:pointer; border:none; border-radius:4px;">Reset PIN</button>
+            </div>
+          </td>
+        </tr>
+      `);
+
       tbody.innerHTML = rows.join('');
     }
 
-    // Admin Reset Member PIN to Default (0000)
     window.adminResetMemberPin = async function(key, memberName) {
       if (confirm(`Are you sure you want to reset PIN for ${memberName} to default '0000'?`)) {
         await update(ref(db, `members/${key}`), { password: "0000" });
@@ -756,15 +892,14 @@
       }
     };
 
-    // Admin Edit Member Details Modal Controls
     window.openAdminEditMemberModal = async function(key) {
       const snapshot = await get(child(ref(db), `members/${key}`));
       if (!snapshot.exists()) return;
 
       const m = snapshot.val();
       document.getElementById("adminEditMemberKey").value = key;
-      document.getElementById("adminEditMemberName").value = m.name || '';
       document.getElementById("adminEditNationalId").value = m.nationalId || '';
+      document.getElementById("adminEditMemberName").value = m.name || '';
       document.getElementById("adminEditMemberPhone").value = m.phone || '';
       document.getElementById("adminEditMemberTarget").value = m.monthlyTarget || 0;
       document.getElementById("adminEditMemberModal").style.display = "flex";
@@ -775,14 +910,14 @@
     document.getElementById("adminEditMemberForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const key = document.getElementById("adminEditMemberKey").value;
-      const name = document.getElementById("adminEditMemberName").value.trim().toUpperCase();
       const nationalId = document.getElementById("adminEditNationalId").value.trim();
+      const name = document.getElementById("adminEditMemberName").value.trim().toUpperCase();
       const phone = document.getElementById("adminEditMemberPhone").value.trim();
       const targetVal = parseFloat(document.getElementById("adminEditMemberTarget").value) || 0;
 
       await update(ref(db, `members/${key}`), {
-        name: name,
         nationalId: nationalId,
+        name: name,
         phone: phone,
         monthlyTarget: targetVal
       });
@@ -822,8 +957,10 @@
       fetchPendingWithdrawals();
     };
 
-    // Admin Add Member Modal Controls
-    window.openAddMemberModal = () => document.getElementById("addMemberModal").style.display = "flex";
+    // Add Member
+    window.openAddMemberModal = () => {
+      document.getElementById("addMemberModal").style.display = "flex";
+    };
     window.closeAddMemberModal = () => document.getElementById("addMemberModal").style.display = "none";
 
     document.getElementById("addMemberForm").addEventListener("submit", async (e) => {
@@ -832,8 +969,9 @@
       const name = document.getElementById("newMemberName").value.trim().toUpperCase();
       const phone = document.getElementById("newMemberPhone").value.trim();
       const target = parseFloat(document.getElementById("newMemberTarget").value) || 0;
+      const registrationTimestamp = Date.now();
 
-      const dbKey = name.replace(/\s+/g, '_').toLowerCase();
+      const dbKey = nationalId.toLowerCase().replace(/[^a-z0-9]/g, '_');
       await set(ref(db, `members/${dbKey}`), {
         nationalId: nationalId,
         name: name,
@@ -842,11 +980,13 @@
         monthlyTarget: target,
         savingsTotal: 0,
         loanBalance: 0,
-        status: "Active"
+        status: "Active",
+        createdAt: registrationTimestamp
       });
 
-      alert(`Member ${name} registered successfully with default PIN '0000'!`);
+      alert(`Member ${name} (${nationalId}) registered successfully!`);
       closeAddMemberModal();
+      document.getElementById("addMemberForm").reset();
       fetchAllMembers();
     });
 
