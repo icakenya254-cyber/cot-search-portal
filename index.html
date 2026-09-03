@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Circle of Trust - Member Portal</title>
+  <title>Circle of Trust - Portal & Management System</title>
   <style>
     :root {
       --primary-color: #1b4d3e;
@@ -16,6 +16,7 @@
       --danger-color: #c0392b;
       --success-color: #27ae60;
       --mpesa-color: #25a244;
+      --manager-color: #2980b9;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -46,7 +47,6 @@
     }
     .auth-btn:hover { background: rgba(255, 255, 255, 0.3); }
 
-    /* Login Card */
     .login-card {
       background: var(--card-bg);
       padding: 24px;
@@ -57,7 +57,6 @@
       border-top: 4px solid var(--primary-color);
     }
 
-    /* Paybill Card Styling */
     .paybill-card {
       background: #e8f5e9;
       border: 2px dashed #27ae60;
@@ -92,7 +91,6 @@
     }
     .btn-stk:hover { background-color: #1e8535; }
 
-    /* Admin Card & Tabs */
     .admin-card {
       display: none;
       background: var(--card-bg);
@@ -123,6 +121,7 @@
     .stat-card { background: var(--card-bg); padding: 16px; border-radius: 12px; border-left: 5px solid var(--secondary-color); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     .stat-card.accent { border-left-color: var(--accent-color); }
     .stat-card.target { border-left-color: #9b59b6; }
+    .stat-card.manager { border-left-color: var(--manager-color); }
     .stat-card h3 { font-size: 0.8rem; color: #666; text-transform: uppercase; }
     .stat-card p { font-size: 1.3rem; font-weight: bold; color: var(--primary-color); margin-top: 4px; }
 
@@ -131,16 +130,15 @@
 
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
-    th { background-color: #f8f9fa; color: #555; }
+    th { background-color: #f8f9fa; color: #555; font-weight: 600; }
     .text-right { text-align: right; }
     .empty-state { text-align: center; padding: 30px; color: #888; }
 
     .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
-    .badge-active { background-color: #e8f8f0; color: var(--success-color); }
     .badge-pending { background-color: #fef9e7; color: #f39c12; }
 
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: var(--card-bg); padding: 24px; border-radius: 12px; width: 90%; max-width: 450px; }
+    .modal-content { background: var(--card-bg); padding: 24px; border-radius: 12px; width: 90%; max-width: 450px; max-height: 90vh; overflow-y: auto; }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .close-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #777; }
 
@@ -163,20 +161,20 @@
   <div class="container">
     <header>
       <div class="auth-bar">
-        <button id="memberLogoutBtn" class="auth-btn" style="display:none;" onclick="memberLogout()">Logout</button>
-        <button id="authToggleBtn" class="auth-btn">Admin Login</button>
+        <button id="memberLogoutBtn" class="auth-btn" style="display:none;" onclick="logoutAll()">Logout</button>
+        <button id="authToggleBtn" class="auth-btn" onclick="handleAuthButtonClick()">Staff / Manager Login</button>
       </div>
       <h1>Circle of Trust (COT)</h1>
-      <p>Member Portal & Savings System</p>
+      <p>Member & Manager Savings Portal System</p>
     </header>
 
     <!-- MEMBER LOGIN CARD -->
     <div id="memberLoginSection" class="login-card">
-      <h2 style="font-size: 1.2rem; margin-bottom: 14px; color: var(--primary-color);">🔑 Member Login</h2>
+      <h2 style="font-size: 1.2rem; margin-bottom: 14px; color: var(--primary-color);">🔐 Member Login</h2>
       <form id="memberLoginForm" style="display: flex; flex-direction: column; gap: 12px;">
         <div class="form-group">
-          <label>National ID Number</label>
-          <input type="text" id="loginNationalId" placeholder="Enter National ID..." required>
+          <label>National ID / Member ID</label>
+          <input type="text" id="loginNationalId" placeholder="Enter National ID or Member ID..." required>
         </div>
         <div class="form-group">
           <label>My PIN</label>
@@ -186,41 +184,107 @@
       </form>
     </div>
 
-    <!-- ADMIN PANEL -->
+    <!-- MANAGER PORTAL DASHBOARD -->
+    <div id="managerPortalContent" style="display: none;">
+      <div class="statement-section" style="margin-bottom: 20px; border-top: 4px solid var(--manager-color);">
+        <div class="statement-header">
+          <div>
+            <h2 style="color: var(--manager-color);" id="managerWelcomeTitle">💼 Manager Portal Dashboard</h2>
+            <small style="color:#666;" id="managerSubText">Managing portfolio and assigned members</small>
+          </div>
+          <button class="btn-submit" style="width:auto; margin:0; background:var(--manager-color);" onclick="openAddMemberModal()">+ Add New Member</button>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card manager">
+            <h3>Assigned Members</h3>
+            <p id="managerTotalMembersCount">0</p>
+          </div>
+          <div class="stat-card accent">
+            <h3>Managed Total Savings</h3>
+            <p id="managerTotalSavingsSum">KES 0.00</p>
+          </div>
+          <div class="stat-card target">
+            <h3>Total Target Savings</h3>
+            <p id="managerTotalTargetSum">KES 0.00</p>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom: 12px; font-size: 1rem;">My Registered Members Directory</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>National ID</th>
+              <th>Full Name</th>
+              <th>Phone No.</th>
+              <th class="text-right">Monthly Target</th>
+              <th class="text-right">Total Savings</th>
+              <th class="text-right">Loan Bal.</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="managerMembersTableBody">
+            <tr><td colspan="7" class="empty-state">Loading assigned member list...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADMIN CONTROL PANEL -->
     <div id="adminPanel" class="admin-card">
-      <h2>🔒 Admin Control Panel</h2>
-      <div class="admin-tabs">
-        <button class="tab-btn active" onclick="switchTab('savingsTab', event)">Savings</button>
-        <button class="tab-btn" onclick="switchTab('loanTab', event)">Loans</button>
-        <button class="tab-btn" onclick="switchTab('withdrawalsTab', event)">Withdrawal Requests</button>
-        <button class="tab-btn" onclick="switchTab('allMembersTab', event)">All Members</button>
+      <h2 id="panelRoleTitle">🛠️ Admin Control Panel</h2>
+      <div class="admin-tabs" id="adminTabsContainer">
+        <button id="tabBtnSavings" class="tab-btn active" onclick="switchTab('savingsTab', event)">Saving Transactions</button>
+        <button id="tabBtnLoans" class="tab-btn" onclick="switchTab('loanTab', event)">Loans</button>
+        <button id="tabBtnWithdrawals" class="tab-btn" onclick="switchTab('withdrawalsTab', event)">Withdrawal Requests</button>
+        <button id="tabBtnMembers" class="tab-btn" onclick="switchTab('allMembersTab', event)">All Members</button>
+        <button id="tabBtnManagers" class="tab-btn" onclick="switchTab('managersTab', event)">Managers Directory</button>
       </div>
 
-      <!-- Admin Tab 1: Savings -->
+      <!-- Admin Tab 1: Savings & History -->
       <div id="savingsTab" class="tab-content active">
-        <form id="savingsForm" class="admin-grid">
-          <div class="form-group">
-            <label>National ID Number</label>
-            <input type="text" id="savingsNationalId" placeholder="Enter National ID..." required>
+        <div class="stats-grid" style="margin-top: 10px;">
+          <div class="stat-card">
+            <h3>Total Members</h3>
+            <p id="adminTotalMembersDisplay">0</p>
           </div>
-          <div class="form-group">
-            <label>Savings Deposit Amount (KES)</label>
-            <input type="number" id="savingsAmount" min="1" required>
+          <div class="stat-card accent">
+            <h3>Total Savings</h3>
+            <p id="adminTotalSavingsDisplay">KES 0.00</p>
           </div>
-          <div class="form-group">
-            <label>Date</label>
-            <input type="date" id="savingsDate" required>
+          <div class="stat-card target">
+            <h3>Total Active Loans</h3>
+            <p id="adminTotalLoansDisplay">KES 0.00</p>
           </div>
-          <button type="submit" class="btn-submit">Record Savings Deposit</button>
-        </form>
+        </div>
+
+        <div class="statement-section" style="margin-top:20px; box-shadow:none; padding:0;">
+          <div class="statement-header">
+            <h2>Saving Transactions History</h2>
+            <button class="btn-submit" style="width:auto; margin:0;" onclick="openAddSavingsModal()">+ Add Saving</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Member Name</th>
+                <th>Amount</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody id="savingsHistoryTableBody">
+              <tr><td colspan="4" class="empty-state">Loading saving history...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Admin Tab 2: Loans -->
       <div id="loanTab" class="tab-content">
         <form id="loanForm" class="admin-grid">
           <div class="form-group">
-            <label>National ID Number</label>
-            <input type="text" id="loanNationalId" placeholder="Enter National ID..." required>
+            <label>National ID / Member ID</label>
+            <input type="text" id="loanNationalId" placeholder="Enter Member ID..." required>
           </div>
           <div class="form-group">
             <label>Transaction Type</label>
@@ -264,7 +328,7 @@
       <!-- Admin Tab 4: All Members -->
       <div id="allMembersTab" class="tab-content">
         <div style="display:flex; justify-content:space-between; margin-bottom:12px; align-items:center;">
-          <h3>Member Directory</h3>
+          <h3 id="directoryHeading">Member Directory</h3>
           <button class="btn-submit" style="width:auto; margin:0;" onclick="openAddMemberModal()">+ Add New Member</button>
         </div>
         <table>
@@ -284,6 +348,28 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Admin Tab 5: Managers Directory -->
+      <div id="managersTab" class="tab-content">
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px; align-items:center;">
+          <h3>Manager Accounts Directory</h3>
+          <button class="btn-submit" style="width:auto; margin:0;" onclick="openAddManagerModal()">+ Add New Manager</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Manager Name</th>
+              <th>Username</th>
+              <th>Passkey</th>
+              <th>Date Added</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="allManagersTableBody">
+            <tr><td colspan="5" class="empty-state">Loading managers...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- MEMBER PORTAL DASHBOARD -->
@@ -297,7 +383,6 @@
         </div>
       </div>
 
-      <!-- WITHDRAWAL WINDOW BANNER -->
       <div class="withdraw-banner">
         <div>
           <strong>📅 Monthly Withdrawal Window:</strong> 
@@ -315,7 +400,7 @@
           </div>
         </div>
         <div class="stat-card">
-          <h3>National ID Number</h3>
+          <h3>National ID / Member ID</h3>
           <p id="nationalIdDisplay">--</p>
         </div>
         <div class="stat-card accent">
@@ -357,6 +442,56 @@
     </div>
   </div>
 
+  <!-- MODAL: ADD SAVING -->
+  <div id="addSavingsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="color:var(--primary-color);">+ Add Saving Deposit</h3>
+        <button class="close-btn" onclick="closeAddSavingsModal()">&times;</button>
+      </div>
+      <form id="savingsForm" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="form-group">
+          <label>Member ID / National ID</label>
+          <input type="text" id="savingsNationalId" placeholder="e.g. COT001 or 12345678" required>
+        </div>
+        <div class="form-group">
+          <label>Savings Deposit Amount (KES)</label>
+          <input type="number" id="savingsAmount" min="1" placeholder="e.g. 500" required>
+        </div>
+        <div class="form-group">
+          <label>Date & Time</label>
+          <input type="datetime-local" id="savingsDateTime" required>
+        </div>
+        <div class="form-group">
+          <label>Note / Remarks</label>
+          <input type="text" id="savingsNote" placeholder="e.g. Monthly contribution or Initial Saving">
+        </div>
+        <button type="submit" class="btn-submit">Record Saving Transaction</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: STAFF / MANAGER / ADMIN LOGIN POPUP -->
+  <div id="staffLoginModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="color:var(--primary-color);">🔑 Staff / Manager Login</h3>
+        <button class="close-btn" onclick="closeStaffLoginModal()">&times;</button>
+      </div>
+      <form id="staffLoginForm" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="staffUsernameInput" placeholder="Enter Username..." required>
+        </div>
+        <div class="form-group">
+          <label>Password / PIN</label>
+          <input type="password" id="staffPasswordInput" placeholder="Enter Password or Passkey..." required>
+        </div>
+        <button type="submit" class="btn-submit">Authenticate</button>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL: STK PUSH DEPOSIT -->
   <div id="stkPushModal" class="modal">
     <div class="modal-content">
@@ -366,7 +501,7 @@
       </div>
       <form id="stkPushForm" style="display:flex; flex-direction:column; gap:12px;">
         <div class="form-group">
-          <label>National ID Number</label>
+          <label>Member ID / National ID</label>
           <input type="text" id="stkNationalId" required>
         </div>
         <div class="form-group">
@@ -437,7 +572,7 @@
     </div>
   </div>
 
-  <!-- MODAL: ADMIN ADD MEMBER -->
+  <!-- MODAL: ADMIN / MANAGER ADD MEMBER -->
   <div id="addMemberModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -446,8 +581,8 @@
       </div>
       <form id="addMemberForm" style="display:flex; flex-direction:column; gap:12px;">
         <div class="form-group">
-          <label>National ID Number</label>
-          <input type="text" id="newNationalId" placeholder="e.g. 12345678" required>
+          <label>Member ID / National ID</label>
+          <input type="text" id="newNationalId" placeholder="e.g. COT001" required>
         </div>
         <div class="form-group">
           <label>Member Full Name</label>
@@ -467,17 +602,43 @@
     </div>
   </div>
 
+  <!-- MODAL: ADMIN ADD MANAGER -->
+  <div id="addManagerModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Register New Manager</h3>
+        <button class="close-btn" onclick="closeAddManagerModal()">&times;</button>
+      </div>
+      <form id="addManagerForm" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="form-group">
+          <label>Manager Full Name</label>
+          <input type="text" id="newManagerName" placeholder="e.g. John Doe" required>
+        </div>
+        <div class="form-group">
+          <label>Username (Unique identifier)</label>
+          <input type="text" id="newManagerUsername" placeholder="e.g. manager1" required>
+        </div>
+        <div class="form-group">
+          <label>Passkey / Password</label>
+          <input type="text" id="newManagerPasskey" value="1234" placeholder="Set passkey..." required>
+        </div>
+        <div style="font-size:0.8rem; color:#666; margin-top:-4px;">* Default Manager Passkey is set to: <strong>1234</strong></div>
+        <button type="submit" class="btn-submit">Create Manager Account</button>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL: ADMIN EDIT MEMBER DETAILS -->
   <div id="adminEditMemberModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Admin: Edit Member Details</h3>
+        <h3>Edit Member Details</h3>
         <button class="close-btn" onclick="closeAdminEditMemberModal()">&times;</button>
       </div>
       <form id="adminEditMemberForm" style="display:flex; flex-direction:column; gap:12px;">
         <input type="hidden" id="adminEditMemberKey">
         <div class="form-group">
-          <label>National ID Number</label>
+          <label>Member ID / National ID</label>
           <input type="text" id="adminEditNationalId" required>
         </div>
         <div class="form-group">
@@ -497,10 +658,37 @@
     </div>
   </div>
 
+  <!-- MODAL: MANAGER VIEW MEMBER SAVINGS HISTORY -->
+  <div id="managerHistoryModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="managerModalTitle">Member Savings History</h3>
+        <button class="close-btn" onclick="closeManagerHistoryModal()">&times;</button>
+      </div>
+      <div style="margin-bottom:12px;">
+        <strong>Total Savings: </strong><span id="managerTotalSavings">KES 0.00</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th class="text-right">Debit</th>
+            <th class="text-right">Credit</th>
+            <th class="text-right">Balance</th>
+          </tr>
+        </thead>
+        <tbody id="managerHistoryTableBody">
+          <tr><td colspan="5" class="empty-state">No transactions recorded.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- FIREBASE INTEGRATION MODULE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-    import { getDatabase, ref, get, set, update, child } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+    import { getDatabase, ref, get, set, update, remove, child } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB9yLNm68mEK4PzO1wj5_jCWn7qTSiOSm0",
@@ -516,11 +704,19 @@
     const db = getDatabase(app);
 
     const ADMIN_PASSKEY = "cotadmin";
-    let isAdminLoggedIn = false;
+    const DEFAULT_MANAGER_PASSKEY = "1234";
+    
+    let userRole = null;
+    let currentManagerUsername = null;
     let currentLoggedInMemberKey = null;
     let currentLoggedInMemberData = null;
 
-    // Helper: Get Today's Date formatted as YYYY-MM-DD
+    function getNowISOString() {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      return now.toISOString().slice(0, 16);
+    }
+
     function getTodayFormatted() {
       const today = new Date();
       const yyyy = today.getFullYear();
@@ -529,11 +725,9 @@
       return `${yyyy}-${mm}-${dd}`;
     }
 
-    // Set Default Dates for Form Inputs on Page Load
     document.addEventListener("DOMContentLoaded", () => {
-      const todayStr = getTodayFormatted();
-      if (document.getElementById("savingsDate")) document.getElementById("savingsDate").value = todayStr;
-      if (document.getElementById("loanDate")) document.getElementById("loanDate").value = todayStr;
+      if (document.getElementById("loanDate")) document.getElementById("loanDate").value = getTodayFormatted();
+      if (document.getElementById("savingsDateTime")) document.getElementById("savingsDateTime").value = getNowISOString();
     });
 
     function checkWithdrawalWindow() {
@@ -553,7 +747,6 @@
       }
     }
 
-    // Lookup exclusively by National ID
     async function findMemberByNationalId(nationalIdInput) {
       const dbRef = ref(db);
       const snapshot = await get(child(dbRef, `members`));
@@ -571,6 +764,68 @@
       return null;
     }
 
+    async function fetchSavingsTabSummary() {
+      const snapshot = await get(child(ref(db), "members"));
+      let totalMembers = 0;
+      let totalSavings = 0;
+      let totalLoans = 0;
+      let allSavingRecords = [];
+
+      if (snapshot.exists()) {
+        const membersObj = snapshot.val();
+        for (const key in membersObj) {
+          const m = membersObj[key];
+          totalMembers++;
+          totalSavings += (m.savingsTotal || 0);
+          totalLoans += (m.loanBalance || 0);
+
+          if (m.transactions && m.transactions.length > 0) {
+            m.transactions.forEach(t => {
+              if (t.credit && t.credit !== "-") {
+                allSavingRecords.push({
+                  dateTime: t.date,
+                  memberName: m.name || m.nationalId || key,
+                  amount: t.credit,
+                  note: t.note || t.desc || "—"
+                });
+              }
+            });
+          }
+        }
+      }
+
+      document.getElementById("adminTotalMembersDisplay").innerText = totalMembers;
+      document.getElementById("adminTotalSavingsDisplay").innerText = `KES ${totalSavings.toLocaleString()}`;
+      document.getElementById("adminTotalLoansDisplay").innerText = `KES ${totalLoans.toLocaleString()}`;
+
+      allSavingRecords.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+      renderSavingsHistoryTable(allSavingRecords);
+    }
+
+    function renderSavingsHistoryTable(records) {
+      const tbody = document.getElementById("savingsHistoryTableBody");
+      if (!records || records.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="empty-state">No saving transactions recorded.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = records.map(r => `
+        <tr>
+          <td>${r.dateTime.replace('T', ' ')}</td>
+          <td><strong>${r.memberName}</strong></td>
+          <td>KSh ${Number(r.amount).toFixed(2)}</td>
+          <td>${r.note}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Modal Add Savings Handler
+    window.openAddSavingsModal = () => {
+      document.getElementById("savingsDateTime").value = getNowISOString();
+      document.getElementById("addSavingsModal").style.display = "flex";
+    };
+    window.closeAddSavingsModal = () => document.getElementById("addSavingsModal").style.display = "none";
+
     // Member Login
     document.getElementById("memberLoginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -579,7 +834,7 @@
 
       const match = await findMemberByNationalId(nationalId);
       if (!match) {
-        alert("No account found with National ID: " + nationalId);
+        alert("No account found with Member ID / National ID: " + nationalId);
         return;
       }
 
@@ -600,14 +855,88 @@
       checkWithdrawalWindow();
     });
 
-    window.memberLogout = function() {
+    // Staff / Manager / Admin Login Handler
+    document.getElementById("staffLoginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("staffUsernameInput").value.trim();
+      const password = document.getElementById("staffPasswordInput").value.trim();
+      const lowerUser = username.toLowerCase();
+
+      if (lowerUser === "admin" && password === ADMIN_PASSKEY) {
+        userRole = 'admin';
+        currentManagerUsername = 'admin';
+        closeStaffLoginModal();
+        setupPanelForRole();
+        return;
+      }
+
+      if (lowerUser === "manager" && password === DEFAULT_MANAGER_PASSKEY) {
+        userRole = 'manager';
+        currentManagerUsername = 'Manager';
+        closeStaffLoginModal();
+        setupPanelForRole();
+        return;
+      }
+
+      const managerKey = lowerUser.replace(/[^a-z0-9]/g, '_');
+      const snap = await get(child(ref(db), `managers/${managerKey}`));
+
+      if (snap.exists()) {
+        const mgr = snap.val();
+        if (password === mgr.passkey) {
+          userRole = 'manager';
+          currentManagerUsername = mgr.username;
+          closeStaffLoginModal();
+          setupPanelForRole();
+        } else {
+          alert("Incorrect Password / PIN!");
+        }
+      } else {
+        alert("Invalid Username or Passkey!");
+      }
+    });
+
+    window.logoutAll = function() {
+      userRole = null;
+      currentManagerUsername = null;
       currentLoggedInMemberKey = null;
       currentLoggedInMemberData = null;
-      document.getElementById("portalContent").style.display = "none";
       document.getElementById("memberLoginSection").style.display = "block";
+      document.getElementById("portalContent").style.display = "none";
+      document.getElementById("managerPortalContent").style.display = "none";
+      document.getElementById("adminPanel").style.display = "none";
       document.getElementById("memberLogoutBtn").style.display = "none";
-      document.getElementById("memberLoginForm").reset();
+      document.getElementById("authToggleBtn").style.display = "inline-block";
     };
+
+    window.handleAuthButtonClick = function() {
+      document.getElementById("staffLoginModal").style.display = "flex";
+    };
+
+    window.closeStaffLoginModal = function() {
+      document.getElementById("staffLoginModal").style.display = "none";
+    };
+
+    function setupPanelForRole() {
+      document.getElementById("memberLoginSection").style.display = "none";
+      document.getElementById("portalContent").style.display = "none";
+      document.getElementById("memberLogoutBtn").style.display = "inline-block";
+      document.getElementById("authToggleBtn").style.display = "none";
+
+      if (userRole === 'admin') {
+        document.getElementById("adminPanel").style.display = "block";
+        document.getElementById("managerPortalContent").style.display = "none";
+        fetchSavingsTabSummary();
+        fetchPendingWithdrawals();
+        fetchAllMembers();
+        fetchAllManagers();
+      } else if (userRole === 'manager') {
+        document.getElementById("adminPanel").style.display = "none";
+        document.getElementById("managerPortalContent").style.display = "block";
+        document.getElementById("managerWelcomeTitle").innerText = `💼 Manager Portal (${currentManagerUsername})`;
+        fetchManagerMembers();
+      }
+    }
 
     function renderMemberData(member) {
       document.getElementById("memberNameDisplay").innerText = member.name;
@@ -624,8 +953,8 @@
       if (member.transactions && member.transactions.length > 0) {
         tbody.innerHTML = member.transactions.map(t => `
           <tr>
-            <td>${t.date}</td>
-            <td>${t.desc}</td>
+            <td>${t.date.replace('T', ' ')}</td>
+            <td>${t.desc} ${t.note ? '(' + t.note + ')' : ''}</td>
             <td class="text-right">${t.debit !== "-" ? 'KES ' + Number(t.debit).toLocaleString() : '-'}</td>
             <td class="text-right">${t.credit !== "-" ? 'KES ' + Number(t.credit).toLocaleString() : '-'}</td>
             <td class="text-right"><strong>KES ${Number(t.balance).toLocaleString()}</strong></td>
@@ -654,7 +983,7 @@
 
       const match = await findMemberByNationalId(nationalId);
       if (!match) {
-        alert("Member with National ID " + nationalId + " not found!");
+        alert("Member with ID " + nationalId + " not found!");
         return;
       }
 
@@ -663,16 +992,17 @@
       document.getElementById("stkPushForm").reset();
     });
 
-    // Admin Savings Deposit
+    // Admin/Staff Deposit Savings
     document.getElementById("savingsForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const nationalId = document.getElementById("savingsNationalId").value.trim();
       const amount = parseFloat(document.getElementById("savingsAmount").value);
-      const date = document.getElementById("savingsDate").value || getTodayFormatted();
+      const dateTime = document.getElementById("savingsDateTime").value || getNowISOString();
+      const note = document.getElementById("savingsNote").value.trim() || "—";
 
       const match = await findMemberByNationalId(nationalId);
       if (!match) {
-        alert("Member with National ID " + nationalId + " not found!");
+        alert("Member with ID " + nationalId + " not found!");
         return;
       }
 
@@ -681,17 +1011,20 @@
       if (!m.transactions) m.transactions = [];
 
       m.transactions.push({
-        date: date,
+        date: dateTime,
         desc: "Savings Deposit",
+        note: note,
         debit: "-",
         credit: amount,
         balance: m.savingsTotal
       });
 
       await set(ref(db, `members/${match.key}`), m);
-      alert(`Successfully recorded deposit of KES ${amount.toLocaleString()} for National ID ${m.nationalId}`);
+      alert(`Successfully recorded saving deposit of KES ${amount.toLocaleString()} for ${m.name || m.nationalId}`);
+      
+      closeAddSavingsModal();
       document.getElementById("savingsForm").reset();
-      document.getElementById("savingsDate").value = getTodayFormatted();
+      fetchSavingsTabSummary();
     });
 
     // Admin Loan Form
@@ -704,7 +1037,7 @@
 
       const match = await findMemberByNationalId(nationalId);
       if (!match) {
-        alert("Member with National ID " + nationalId + " not found!");
+        alert("Member with ID " + nationalId + " not found!");
         return;
       }
 
@@ -732,9 +1065,10 @@
       }
 
       await set(ref(db, `members/${match.key}`), m);
-      alert(`Loan record updated for National ID ${m.nationalId}`);
+      alert(`Loan record updated for ${m.name || m.nationalId}`);
       document.getElementById("loanForm").reset();
       document.getElementById("loanDate").value = getTodayFormatted();
+      fetchSavingsTabSummary();
     });
 
     // Change PIN Controls
@@ -748,7 +1082,7 @@
 
       if (!currentLoggedInMemberKey) {
         alert("Session expired. Please log in again.");
-        window.memberLogout();
+        window.logoutAll();
         return;
       }
 
@@ -811,25 +1145,6 @@
       renderMemberData(currentLoggedInMemberData);
       alert("Monthly saving target updated!");
       closeTargetModal();
-    });
-
-    // Admin Auth
-    const authBtn = document.getElementById("authToggleBtn");
-    authBtn.addEventListener("click", () => {
-      if (!isAdminLoggedIn) {
-        const pass = prompt("Enter Admin Passkey:");
-        if (pass === ADMIN_PASSKEY) {
-          isAdminLoggedIn = true;
-          document.getElementById("adminPanel").style.display = "block";
-          authBtn.innerText = "Admin Logout";
-          fetchPendingWithdrawals();
-          fetchAllMembers();
-        } else if (pass !== null) alert("Incorrect Passkey!");
-      } else {
-        isAdminLoggedIn = false;
-        document.getElementById("adminPanel").style.display = "none";
-        authBtn.innerText = "Admin Login";
-      }
     });
 
     // Pending Withdrawals List
@@ -903,6 +1218,144 @@
       tbody.innerHTML = rows.join('');
     }
 
+    // Manager Portal Member Directory
+    async function fetchManagerMembers() {
+      const snapshot = await get(child(ref(db), "members"));
+      const tbody = document.getElementById("managerMembersTableBody");
+
+      if (!snapshot.exists()) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No members assigned to your manager account.</td></tr>`;
+        return;
+      }
+
+      const membersObj = snapshot.val();
+      const memberList = [];
+      let managerSavingsSum = 0;
+      let managerTargetSum = 0;
+
+      for (const key in membersObj) {
+        const m = membersObj[key];
+        if (m.managerUsername === currentManagerUsername || currentManagerUsername === 'Manager' || currentManagerUsername === 'admin') {
+          memberList.push({ key, ...m });
+          managerSavingsSum += (m.savingsTotal || 0);
+          managerTargetSum += (m.monthlyTarget || 0);
+        }
+      }
+
+      document.getElementById("managerTotalMembersCount").innerText = memberList.length;
+      document.getElementById("managerTotalSavingsSum").innerText = `KES ${managerSavingsSum.toLocaleString()}`;
+      document.getElementById("managerTotalTargetSum").innerText = `KES ${managerTargetSum.toLocaleString()}`;
+
+      if (memberList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No members registered under manager '${currentManagerUsername}'.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = memberList.map(m => `
+        <tr>
+          <td><strong>${m.nationalId || '-'}</strong></td>
+          <td>${m.name}</td>
+          <td>${m.phone || '-'}</td>
+          <td class="text-right">KES ${(m.monthlyTarget || 0).toLocaleString()}</td>
+          <td class="text-right">KES ${(m.savingsTotal || 0).toLocaleString()}</td>
+          <td class="text-right">KES ${(m.loanBalance || 0).toLocaleString()}</td>
+          <td>
+            <button onclick="viewMemberHistory('${m.key}')" style="padding:4px 8px; font-size:0.8rem; cursor:pointer; background:var(--manager-color); color:white; border:none; border-radius:4px;">View Statement</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.viewMemberHistory = async function(key) {
+      const snap = await get(child(ref(db), `members/${key}`));
+      if (!snap.exists()) return;
+
+      const m = snap.val();
+      document.getElementById("managerModalTitle").innerText = `${m.name}'s Statement`;
+      document.getElementById("managerTotalSavings").innerText = `KES ${(m.savingsTotal || 0).toLocaleString()}`;
+
+      const tbody = document.getElementById("managerHistoryTableBody");
+      if (m.transactions && m.transactions.length > 0) {
+        tbody.innerHTML = m.transactions.map(t => `
+          <tr>
+            <td>${t.date.replace('T', ' ')}</td>
+            <td>${t.desc} ${t.note ? '(' + t.note + ')' : ''}</td>
+            <td class="text-right">${t.debit !== "-" ? 'KES ' + Number(t.debit).toLocaleString() : '-'}</td>
+            <td class="text-right">${t.credit !== "-" ? 'KES ' + Number(t.credit).toLocaleString() : '-'}</td>
+            <td class="text-right"><strong>KES ${Number(t.balance).toLocaleString()}</strong></td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No transaction history found for this member.</td></tr>`;
+      }
+
+      document.getElementById("managerHistoryModal").style.display = "flex";
+    };
+
+    window.closeManagerHistoryModal = () => document.getElementById("managerHistoryModal").style.display = "none";
+
+    // All Managers Directory
+    async function fetchAllManagers() {
+      const snapshot = await get(child(ref(db), "managers"));
+      const tbody = document.getElementById("allManagersTableBody");
+
+      if (!snapshot.exists()) {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No custom manager accounts found. (Default 'Manager' account active).</td></tr>`;
+        return;
+      }
+
+      const mgrs = snapshot.val();
+      const rows = [];
+
+      for (const k in mgrs) {
+        const mgr = mgrs[k];
+        rows.push(`
+          <tr>
+            <td><strong>${mgr.name}</strong></td>
+            <td>${mgr.username}</td>
+            <td><code>${mgr.passkey}</code></td>
+            <td>${mgr.dateAdded || '-'}</td>
+            <td>
+              <button onclick="deleteManagerAccount('${k}')" class="btn-danger" style="padding:4px 8px; font-size:0.8rem; cursor:pointer; border:none; border-radius:4px;">Remove</button>
+            </td>
+          </tr>
+        `);
+      }
+
+      tbody.innerHTML = rows.length > 0 ? rows.join('') : `<tr><td colspan="5" class="empty-state">No manager accounts registered.</td></tr>`;
+    }
+
+    window.openAddManagerModal = () => document.getElementById("addManagerModal").style.display = "flex";
+    window.closeAddManagerModal = () => document.getElementById("addManagerModal").style.display = "none";
+
+    document.getElementById("addManagerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("newManagerName").value.trim();
+      const username = document.getElementById("newManagerUsername").value.trim().toLowerCase();
+      const passkey = document.getElementById("newManagerPasskey").value.trim();
+
+      const mgrKey = username.replace(/[^a-z0-9]/g, '_');
+      await set(ref(db, `managers/${mgrKey}`), {
+        name: name,
+        username: username,
+        passkey: passkey,
+        dateAdded: getTodayFormatted()
+      });
+
+      alert(`Manager '${name}' (${username}) successfully registered!`);
+      closeAddManagerModal();
+      document.getElementById("addManagerForm").reset();
+      fetchAllManagers();
+    });
+
+    window.deleteManagerAccount = async function(key) {
+      if (confirm("Are you sure you want to remove this manager account?")) {
+        await remove(ref(db, `managers/${key}`));
+        alert("Manager account removed.");
+        fetchAllManagers();
+      }
+    };
+
     window.adminResetMemberPin = async function(key, memberName) {
       if (confirm(`Are you sure you want to reset PIN for ${memberName} to default '0000'?`)) {
         await update(ref(db, `members/${key}`), { password: "0000" });
@@ -955,7 +1408,7 @@
         if (!m.transactions) m.transactions = [];
 
         m.transactions.push({
-          date: getTodayFormatted(),
+          date: getNowISOString(),
           desc: "Savings Withdrawal",
           debit: amount,
           credit: "-",
@@ -966,6 +1419,7 @@
         await update(ref(db, `withdrawals/${wId}`), { status: "Approved" });
         alert("Withdrawal approved!");
         fetchPendingWithdrawals();
+        fetchSavingsTabSummary();
       }
     };
 
@@ -975,10 +1429,8 @@
       fetchPendingWithdrawals();
     };
 
-    // Add Member
-    window.openAddMemberModal = () => {
-      document.getElementById("addMemberModal").style.display = "flex";
-    };
+    // Add Member Functionality
+    window.openAddMemberModal = () => document.getElementById("addMemberModal").style.display = "flex";
     window.closeAddMemberModal = () => document.getElementById("addMemberModal").style.display = "none";
 
     document.getElementById("addMemberForm").addEventListener("submit", async (e) => {
@@ -999,13 +1451,16 @@
         savingsTotal: 0,
         loanBalance: 0,
         status: "Active",
-        createdAt: registrationTimestamp
+        createdAt: registrationTimestamp,
+        managerUsername: currentManagerUsername || 'admin'
       });
 
       alert(`Member ${name} (${nationalId}) registered successfully!`);
       closeAddMemberModal();
       document.getElementById("addMemberForm").reset();
-      fetchAllMembers();
+
+      if (userRole === 'admin') fetchAllMembers();
+      if (userRole === 'manager') fetchManagerMembers();
     });
 
     window.switchTab = function(tabId, e) {
@@ -1013,7 +1468,10 @@
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       e.target.classList.add('active');
       document.getElementById(tabId).classList.add('active');
+
+      if (tabId === 'savingsTab') fetchSavingsTabSummary();
       if (tabId === 'allMembersTab') fetchAllMembers();
+      if (tabId === 'managersTab') fetchAllManagers();
     };
   </script>
 </body>
