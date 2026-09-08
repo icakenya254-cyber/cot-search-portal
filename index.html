@@ -156,9 +156,8 @@
       align-items: center;
     }
 
-    .btn-action-group { display: flex; gap: 4px; }
+    .btn-action-group { display: flex; gap: 4px; flex-wrap: wrap; }
 
-    /* SEARCH RESULTS DROPDOWN FOR SAVINGS MODAL */
     .search-results-list {
       position: absolute;
       top: 100%;
@@ -283,7 +282,7 @@
             <div class="stat-card manager">
               <h3>Commission Wallet Balance</h3>
               <p id="managerCommissionWalletDisplay" style="color: var(--mpesa-color);">KES 0.00</p>
-              <button onclick="openCommissionPayoutModal()" style="margin-top:8px; font-size:0.8rem; background:var(--mpesa-color); color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:600;">Request M-PESA Payout</button>
+              <small style="color:#555; display:block; margin-top:4px;">* Automatically swept on the 28th to Member Portal Savings Account.</small>
             </div>
             <div class="stat-card accent">
               <h3>Registration Rate</h3>
@@ -421,7 +420,7 @@
             <tr>
               <th>National ID</th>
               <th>Full Name</th>
-              <th>Phone No.</th>
+              <th>Assigned Manager</th>
               <th class="text-right">Target (Monthly)</th>
               <th class="text-right">Savings</th>
               <th class="text-right">Loan Bal.</th>
@@ -490,7 +489,7 @@
           <p id="nationalIdDisplay">--</p>
         </div>
         <div class="stat-card accent">
-          <h3>Total Savings</h3>
+          <h3>Total Savings (Inc. Commissions)</h3>
           <p id="totalSavingsDisplay">KES 0.00</p>
         </div>
         <div class="stat-card target">
@@ -525,6 +524,30 @@
           </tbody>
         </table>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ASSIGN MEMBER TO MANAGER -->
+  <div id="assignManagerModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="color:var(--manager-color);">Assign Member to Manager</h3>
+        <button class="close-btn" onclick="closeAssignManagerModal()">&times;</button>
+      </div>
+      <form id="assignManagerForm" style="display:flex; flex-direction:column; gap:12px;">
+        <input type="hidden" id="assignMemberKey">
+        <div class="form-group">
+          <label>Member Full Name</label>
+          <input type="text" id="assignMemberName" readonly>
+        </div>
+        <div class="form-group">
+          <label>Select Manager</label>
+          <select id="assignManagerSelect" required>
+            <option value="">-- Choose Manager --</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-submit" style="background:var(--manager-color);">Save Manager Assignment</button>
+      </form>
     </div>
   </div>
 
@@ -564,7 +587,6 @@
         <button class="close-btn" onclick="closeAddSavingsModal()">&times;</button>
       </div>
       <form id="savingsForm" style="display:flex; flex-direction:column; gap:12px;">
-        
         <div class="form-group">
           <label>Search & Select Member (Name or National ID)</label>
           <input type="text" id="memberSearchInput" placeholder="Type member name or ID..." autocomplete="off">
@@ -753,27 +775,6 @@
     </div>
   </div>
 
-  <!-- MODAL: MANAGER PAYOUT REQUEST -->
-  <div id="commissionPayoutModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 style="color:var(--mpesa-color);">📲 Request M-PESA Commission Payout</h3>
-        <button class="close-btn" onclick="closeCommissionPayoutModal()">&times;</button>
-      </div>
-      <form id="commissionPayoutForm" style="display:flex; flex-direction:column; gap:12px;">
-        <div class="form-group">
-          <label>Payout Amount (KES)</label>
-          <input type="number" id="payoutAmountInput" min="10" required>
-        </div>
-        <div class="form-group">
-          <label>M-PESA Phone Number</label>
-          <input type="tel" id="payoutPhoneInput" placeholder="e.g. 0712345678" required>
-        </div>
-        <button type="submit" class="btn-submit" style="background:var(--mpesa-color);">Submit Cashout Request</button>
-      </form>
-    </div>
-  </div>
-
   <!-- MODAL: ADMIN EDIT MEMBER DETAILS -->
   <div id="adminEditMemberModal" class="modal">
     <div class="modal-content">
@@ -877,13 +878,11 @@
       if (document.getElementById("loanDate")) document.getElementById("loanDate").value = getTodayFormatted();
       if (document.getElementById("savingsDateTime")) document.getElementById("savingsDateTime").value = getNowISOString();
       
-      // Live search input listener for savings modal
       const searchInput = document.getElementById("memberSearchInput");
       if (searchInput) {
         searchInput.addEventListener("input", handleMemberSearchInput);
       }
       
-      // Hide search dropdown on click outside
       document.addEventListener("click", (evt) => {
         const dropdown = document.getElementById("searchResultsDropdown");
         const searchBox = document.getElementById("memberSearchInput");
@@ -891,7 +890,69 @@
           dropdown.style.display = "none";
         }
       });
+
+      // AUTO-TRANSFER MANAGER COMMISSIONS ON THE 28TH OF EVERY MONTH
+      checkAndAutoSweepCommissions();
     });
+
+    async function checkAndAutoSweepCommissions() {
+      const today = new Date();
+      if (today.getDate() !== 28) return;
+
+      const currentMonthKey = `${today.getFullYear()}_${today.getMonth() + 1}`;
+      const sweepLogRef = ref(db, `system_logs/commission_sweeps/${currentMonthKey}`);
+      const sweepSnap = await get(sweepLogRef);
+
+      if (sweepSnap.exists()) return; // Already processed for this month
+
+      const mgrSnap = await get(child(ref(db), "managers"));
+      if (!mgrSnap.exists()) return;
+
+      const managers = mgrSnap.val();
+      for (const k in managers) {
+        const mgr = managers[k];
+        const walletBal = mgr.commissionWallet || 0;
+
+        if (walletBal > 0) {
+          // Locate manager's member portal account (using username or username_mgr as national ID/key)
+          let match = await findMemberByNationalId(mgr.username);
+          if (!match) {
+            match = await findMemberByNationalId(`${mgr.username}_mgr`);
+          }
+
+          if (match) {
+            const m = match.data;
+            m.savingsTotal = (m.savingsTotal || 0) + walletBal;
+            if (!m.transactions) m.transactions = [];
+
+            m.transactions.push({
+              date: getTodayFormatted(),
+              desc: "Monthly Manager Commission Auto-Transfer",
+              note: "Automated 28th Monthly Payout",
+              debit: "-",
+              credit: walletBal,
+              balance: m.savingsTotal
+            });
+
+            await set(ref(db, `members/${match.key}`), m);
+
+            // Deduct manager wallet
+            mgr.commissionWallet = 0;
+            if (!mgr.commissionsHistory) mgr.commissionsHistory = [];
+            mgr.commissionsHistory.push({
+              date: getTodayFormatted(),
+              amount: -walletBal,
+              type: "AUTO_COMMISSION_TRANSFER",
+              description: `Automated transfer of KES ${walletBal} to Member Portal Account`
+            });
+
+            await set(ref(db, `managers/${k}`), mgr);
+          }
+        }
+      }
+
+      await set(sweepLogRef, { processedAt: getNowISOString(), date: getTodayFormatted() });
+    }
 
     function checkWithdrawalWindow() {
       const today = new Date();
@@ -1013,18 +1074,15 @@
       `).join('');
     }
 
-    // Modal Add Savings Handler
     window.openAddSavingsModal = async () => {
       document.getElementById("savingsDateTime").value = getNowISOString();
       document.getElementById("addSavingsModal").style.display = "flex";
       
-      // Reset search form fields
       document.getElementById("memberSearchInput").value = "";
       document.getElementById("savingsNationalId").value = "";
       document.getElementById("searchResultsDropdown").style.display = "none";
       document.getElementById("selectedMemberDisplay").style.display = "none";
 
-      // Cache all system members for fast live filtering
       const snapshot = await get(child(ref(db), "members"));
       allSystemMembersList = [];
       if (snapshot.exists()) {
@@ -1078,7 +1136,6 @@
       document.getElementById("selectedMemberDisplay").style.display = "block";
     };
 
-    // Member Login
     document.getElementById("memberLoginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const nationalId = document.getElementById("loginNationalId").value.trim();
@@ -1107,7 +1164,6 @@
       checkWithdrawalWindow();
     });
 
-    // Staff / Manager / Admin Login Handler
     document.getElementById("staffLoginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const username = document.getElementById("staffUsernameInput").value.trim();
@@ -1222,7 +1278,6 @@
       }
     }
 
-    // Modal STK Push
     window.openStkPushModal = () => {
       if (currentLoggedInMemberData) {
         document.getElementById("stkNationalId").value = currentLoggedInMemberData.nationalId || '';
@@ -1249,7 +1304,6 @@
       document.getElementById("stkPushForm").reset();
     });
 
-    // Admin/Staff Deposit Savings
     document.getElementById("savingsForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const nationalId = document.getElementById("savingsNationalId").value.trim();
@@ -1289,7 +1343,6 @@
       fetchSavingsTabSummary();
     });
 
-    // Admin Loan Form
     document.getElementById("loanForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const nationalId = document.getElementById("loanNationalId").value.trim();
@@ -1333,7 +1386,6 @@
       fetchSavingsTabSummary();
     });
 
-    // Change PIN Controls
     window.openChangePinModal = () => document.getElementById("changePinModal").style.display = "flex";
     window.closeChangePinModal = () => document.getElementById("changePinModal").style.display = "none";
 
@@ -1367,7 +1419,6 @@
       }
     });
 
-    // Withdrawal Modal
     window.openWithdrawModal = () => document.getElementById("withdrawModal").style.display = "flex";
     window.closeWithdrawModal = () => document.getElementById("withdrawModal").style.display = "none";
 
@@ -1394,7 +1445,6 @@
       closeWithdrawModal();
     });
 
-    // Target Modal
     window.openTargetModal = () => document.getElementById("targetModal").style.display = "flex";
     window.closeTargetModal = () => document.getElementById("targetModal").style.display = "none";
 
@@ -1409,7 +1459,6 @@
       closeTargetModal();
     });
 
-    // Pending Withdrawals List
     async function fetchPendingWithdrawals() {
       const snapshot = await get(child(ref(db), "withdrawals"));
       const tbody = document.getElementById("adminWithdrawalsTableBody");
@@ -1442,7 +1491,6 @@
       tbody.innerHTML = rows.length > 0 ? rows.join('') : `<tr><td colspan="6" class="empty-state">No pending requests.</td></tr>`;
     }
 
-    // All Members Directory
     async function fetchAllMembers() {
       const snapshot = await get(child(ref(db), "members"));
       const tbody = document.getElementById("allMembersTableBody");
@@ -1464,14 +1512,15 @@
         <tr>
           <td><strong>${m.nationalId || '-'}</strong></td>
           <td>${m.name}</td>
-          <td>${m.phone || '-'}</td>
+          <td><span class="badge badge-credit">${m.managerUsername || 'admin'}</span></td>
           <td class="text-right">KES ${(m.monthlyTarget || 0).toLocaleString()}</td>
           <td class="text-right">KES ${(m.savingsTotal || 0).toLocaleString()}</td>
           <td class="text-right">KES ${(m.loanBalance || 0).toLocaleString()}</td>
           <td>
             <div class="btn-action-group">
+              <button onclick="openAssignManagerModal('${m.key}', '${m.name.replace(/'/g, "\\'")}')" style="padding:4px 8px; font-size:0.8rem; cursor:pointer; background:var(--manager-color); color:white; border:none; border-radius:4px;">Assign Manager</button>
               <button onclick="openAdminEditMemberModal('${m.key}')" style="padding:4px 8px; font-size:0.8rem; cursor:pointer;">Edit</button>
-              <button onclick="adminResetMemberPin('${m.key}', '${m.name}')" class="btn-danger" style="padding:4px 8px; font-size:0.8rem; cursor:pointer; border:none; border-radius:4px;">Reset PIN</button>
+              <button onclick="adminResetMemberPin('${m.key}', '${m.name.replace(/'/g, "\\'")}')" class="btn-danger" style="padding:4px 8px; font-size:0.8rem; cursor:pointer; border:none; border-radius:4px;">Reset PIN</button>
             </div>
           </td>
         </tr>
@@ -1480,7 +1529,44 @@
       tbody.innerHTML = rows.join('');
     }
 
-    // Manager Portal Member Directory
+    // ASSIGN MANAGER MODAL HANDLERS
+    window.openAssignManagerModal = async function(memberKey, memberName) {
+      document.getElementById("assignMemberKey").value = memberKey;
+      document.getElementById("assignMemberName").value = memberName;
+
+      const select = document.getElementById("assignManagerSelect");
+      select.innerHTML = `<option value="">-- Select Manager --</option><option value="admin">Admin System</option>`;
+
+      const mgrSnap = await get(child(ref(db), "managers"));
+      if (mgrSnap.exists()) {
+        const mgrs = mgrSnap.val();
+        for (const k in mgrs) {
+          const mgr = mgrs[k];
+          select.innerHTML += `<option value="${mgr.username}">${mgr.name} (@${mgr.username})</option>`;
+        }
+      }
+
+      document.getElementById("assignManagerModal").style.display = "flex";
+    };
+
+    window.closeAssignManagerModal = () => document.getElementById("assignManagerModal").style.display = "none";
+
+    document.getElementById("assignManagerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const memberKey = document.getElementById("assignMemberKey").value;
+      const selectedManager = document.getElementById("assignManagerSelect").value;
+
+      if (!selectedManager) {
+        alert("Please select a valid manager!");
+        return;
+      }
+
+      await update(ref(db, `members/${memberKey}`), { managerUsername: selectedManager });
+      alert("Member successfully assigned to manager: " + selectedManager);
+      closeAssignManagerModal();
+      fetchAllMembers();
+    });
+
     async function fetchManagerMembers() {
       const snapshot = await get(child(ref(db), "members"));
       const tbody = document.getElementById("managerMembersTableBody");
@@ -1528,7 +1614,6 @@
       `).join('');
     }
 
-    // Manager Portal Commissions & Earnings
     async function fetchManagerCommissions() {
       if (!currentManagerKey || currentManagerKey === 'admin') return;
 
@@ -1569,44 +1654,6 @@
       `).join('');
     }
 
-    window.openCommissionPayoutModal = () => document.getElementById("commissionPayoutModal").style.display = "flex";
-    window.closeCommissionPayoutModal = () => document.getElementById("commissionPayoutModal").style.display = "none";
-
-    document.getElementById("commissionPayoutForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const amount = parseFloat(document.getElementById("payoutAmountInput").value);
-      const phone = document.getElementById("payoutPhoneInput").value.trim();
-
-      const mgrRef = ref(db, `managers/${currentManagerKey}`);
-      const snap = await get(mgrRef);
-
-      if (snap.exists()) {
-        const mgr = snap.val();
-        const currentBal = mgr.commissionWallet || 0;
-
-        if (amount > currentBal) {
-          alert("Requested cashout amount exceeds available wallet balance!");
-          return;
-        }
-
-        mgr.commissionWallet = currentBal - amount;
-        if (!mgr.commissionsHistory) mgr.commissionsHistory = [];
-
-        mgr.commissionsHistory.push({
-          date: getTodayFormatted(),
-          amount: -amount,
-          type: "PAYOUT_REQUEST",
-          description: `M-PESA Payout Request to ${phone}`
-        });
-
-        await set(mgrRef, mgr);
-        alert(`Payout request of KES ${amount.toLocaleString()} submitted for M-PESA transfer to ${phone}!`);
-        closeCommissionPayoutModal();
-        document.getElementById("commissionPayoutForm").reset();
-        fetchManagerCommissions();
-      }
-    });
-
     window.viewMemberHistory = async function(key) {
       const snap = await get(child(ref(db), `members/${key}`));
       if (!snap.exists()) return;
@@ -1635,7 +1682,6 @@
 
     window.closeManagerHistoryModal = () => document.getElementById("managerHistoryModal").style.display = "none";
 
-    // Admin Manager Directory & View Members Action
     async function fetchAllManagers() {
       const snapshot = await get(child(ref(db), "managers"));
       const tbody = document.getElementById("allManagersTableBody");
@@ -1659,7 +1705,7 @@
             <td>${mgr.dateAdded || '-'}</td>
             <td>
               <div class="btn-action-group">
-                <button onclick="adminViewManagerMembers('${mgr.username}', '${mgr.name}')" style="padding:4px 8px; font-size:0.8rem; cursor:pointer; background:var(--manager-color); color:white; border:none; border-radius:4px;">View Members</button>
+                <button onclick="adminViewManagerMembers('${mgr.username}', '${mgr.name.replace(/'/g, "\\'")}')" style="padding:4px 8px; font-size:0.8rem; cursor:pointer; background:var(--manager-color); color:white; border:none; border-radius:4px;">View Members</button>
                 <button onclick="deleteManagerAccount('${k}')" class="btn-danger" style="padding:4px 8px; font-size:0.8rem; cursor:pointer; border:none; border-radius:4px;">Remove</button>
               </div>
             </td>
@@ -1735,7 +1781,22 @@
         dateAdded: getTodayFormatted()
       });
 
-      alert(`Manager '${name}' (${username}) successfully registered!`);
+      // Auto-create a corresponding member profile for the manager so commissions can be auto-transferred and withdrawn
+      const memberKey = username;
+      await set(ref(db, `members/${memberKey}`), {
+        nationalId: username,
+        name: `${name} (Manager)`,
+        phone: "-",
+        password: "0000",
+        monthlyTarget: 0,
+        savingsTotal: 0,
+        loanBalance: 0,
+        status: "Active",
+        createdAt: Date.now(),
+        managerUsername: "admin"
+      });
+
+      alert(`Manager '${name}' (${username}) successfully registered and Member Portal profile initialized!`);
       closeAddManagerModal();
       document.getElementById("addManagerForm").reset();
       fetchAllManagers();
@@ -1833,7 +1894,6 @@
       fetchPendingWithdrawals();
     };
 
-    // Add Member Functionality
     window.openAddMemberModal = () => document.getElementById("addMemberModal").style.display = "flex";
     window.closeAddMemberModal = () => document.getElementById("addMemberModal").style.display = "none";
 
